@@ -1,0 +1,52 @@
+{
+  "title": "Inventory / Stock Check",
+  "subtitle": "Search collateral by receipt, customer, weight, and status",
+  "search": {
+    "receipt": "Receipt no.",
+    "customer": "Customer / phone / ID / barcode",
+    "barcode": "Barcode / QR scan",
+    "barcode_hint": "Name, phone, or barcode",
+    "status": "Status",
+    "commodity": "Commodity",
+    "min_weight": "Min weight (g)",
+    "max_weight": "Max weight (g)",
+    "all_statuses": "All statuses",
+    "all_commodities": "All",
+    "submit": "Search",
+    "searching": "Searching…"
+  },
+  "status": {
+    "available": "Available",
+    "released": "Released",
+    "auctioned": "Auctioned",
+    "bank_pledged": "Bank pledged",
+    "renewed": "Renewed",
+    "lost": "Lost",
+    "damaged": "Damaged",
+    "transferred": "Transferred"
+  },
+  "columns": {
+    "receipt": "Receipt",
+    "customer": "Customer",
+    "status": "Status",
+    "commodity": "Commodity",
+    "weight": "Weight (g)",
+    "amount": "Loan amount",
+    "renewal": "Renewal date"
+  },
+  "summary": {
+    "available": "Available",
+    "bank_pledged": "Bank pledged",
+    "released": "Released",
+    "renewed": "Renewed",
+    "auctioned": "Auctioned",
+    "lost": "Lost",
+    "damaged": "Damaged",
+    "transferred": "Transferred"
+  },
+  "manage": "Manage",
+  "empty": "No matching stock found.",
+  "detail": {
+    "items": "Items"
+  }
+}

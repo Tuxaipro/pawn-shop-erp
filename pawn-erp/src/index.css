@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    @apply h-full scroll-smooth antialiased;
+  }
+
+  body {
+    @apply min-h-full bg-zinc-100/80 font-sans text-zinc-950;
+  }
+
+  a {
+    @apply text-zinc-950 underline-offset-2 hover:underline;
+  }
+}

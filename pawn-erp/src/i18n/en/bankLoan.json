@@ -1,0 +1,81 @@
+{
+  "title": "Bank Loan",
+  "subtitle": "View bank deposit register and record new bank loans",
+  "nav": {
+    "list": "Deposit list",
+    "record": "Record deposit",
+    "batch": "Batch deposit"
+  },
+  "list": {
+    "title": "Bank deposit register",
+    "empty": "No bank deposits recorded yet.",
+    "record_new": "Record deposit",
+    "from_date": "From date",
+    "to_date": "To date",
+    "search": "Search name, phone or customer ID"
+  },
+  "record": {
+    "title": "Record bank deposit",
+    "subtitle": "Fetch an open loan and record a bank deposit (re-pledge)",
+    "receipt_no": "Receipt No.",
+    "fetch": "Fetch loan",
+    "fetching": "Fetching…",
+    "not_found": "No open loan found for this receipt.",
+    "closed_loan": "This loan is closed.",
+    "already_deposited": "This loan already has an open bank deposit."
+  },
+  "columns": {
+    "receipt": "Receipt",
+    "customer": "Customer",
+    "bank": "Bank",
+    "amount": "Deposit amount",
+    "deposit_date": "Deposit date",
+    "status": "Status",
+    "actions": "Actions"
+  },
+  "status": {
+    "open": "Open",
+    "settled": "Settled"
+  },
+  "detail": {
+    "loan": "Loan details",
+    "customer": "Customer",
+    "items": "Collateral items",
+    "interest": "Interest (as of today)",
+    "amount_paid": "Amount paid",
+    "amount_to_pay": "Amount to be paid",
+    "existing_deposits": "Existing bank deposits",
+    "add_deposit": "Add bank deposit"
+  },
+  "fields": {
+    "bank_name": "Bank name",
+    "amount": "Deposit amount",
+    "deposit_date": "Deposit date",
+    "receipt_no": "Bank receipt no."
+  },
+  "actions": {
+    "save": "Save deposit",
+    "release": "Release from bank",
+    "releasing": "Releasing…"
+  },
+  "release": {
+    "title": "Release from bank",
+    "closing_date": "Release / closing date",
+    "security_pin": "Security PIN",
+    "submit": "Confirm release"
+  },
+  "batch": {
+    "title": "Batch bank deposit",
+    "subtitle": "Select multiple open loans and deposit to the same bank",
+    "search": "Search receipt, name or phone",
+    "bank_name": "Bank name",
+    "deposit_date": "Deposit date",
+    "bank_receipt": "Bank receipt no.",
+    "selected": "{{count}} selected",
+    "submit": "Create batch deposit",
+    "submitting": "Saving…",
+    "success": "{{count}} deposits created",
+    "empty": "No eligible loans found.",
+    "select_all": "Select all on page"
+  }
+}

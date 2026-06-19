@@ -1,0 +1,689 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  BRANCH_MANAGER
+  CASHIER
+  APPRAISER
+  ACCOUNTANT
+  AUDITOR
+}
+
+// ─── Masters (commodity, interest, loan enums) ─────────────────────────────
+
+model CommodityMainCategory {
+  id        Int     @id @default(autoincrement())
+  nameEn    String  @map("name") @db.VarChar(50)
+  nameTa    String  @default("") @map("name_ta") @db.VarChar(50)
+  status    Boolean @default(true)
+  isDeleted Boolean @default(false) @map("is_deleted")
+
+  subCategories CommoditySubCategory[]
+  subItems      CommoditySubItem[]
+  taxSlabs      TaxDeclaration[]
+  loans         Loan[]
+
+  @@map("master_commodity_main_category")
+}
+
+model CommoditySubCategory {
+  id              Int     @id @default(autoincrement()) @map("sid")
+  commodityTypeId Int     @map("cid")
+  nameEn          String  @map("sname") @db.VarChar(200)
+  nameTa          String  @default("") @map("sname_ta") @db.VarChar(200)
+  status          Boolean @default(true)
+  isDeleted       Boolean @default(false) @map("is_deleted")
+
+  commodityType CommodityMainCategory @relation(fields: [commodityTypeId], references: [id])
+  subItems      CommoditySubItem[]
+  loanItems     LoanItem[]
+
+  @@unique([commodityTypeId, nameEn])
+  @@map("master_commodity_sub_category")
+}
+
+model CommoditySubItem {
+  id              BigInt  @id @default(autoincrement()) @map("i_id")
+  commodityTypeId Int     @map("cid")
+  subCategoryId   Int     @map("sid")
+  nameEn          String  @map("iname") @db.VarChar(200)
+  nameTa          String  @default("") @map("iname_ta") @db.VarChar(200)
+  status          Boolean @default(true)
+  isDeleted       Boolean @default(false) @map("is_deleted")
+
+  commodityType CommodityMainCategory @relation(fields: [commodityTypeId], references: [id])
+  subCategory   CommoditySubCategory  @relation(fields: [subCategoryId], references: [id])
+  loanItems     LoanItem[]
+
+  @@unique([commodityTypeId, subCategoryId, nameEn])
+  @@map("master_commodity_sub_item")
+}
+
+model Purity {
+  id       Int    @id @default(autoincrement()) @map("purity_id")
+  nameTamil String @map("purity_name_tamil") @db.VarChar(20)
+  nameEng   String @map("purity_name_eng") @db.VarChar(20)
+
+  loanItems LoanItem[]
+
+  @@map("master_purity")
+}
+
+model LoanCondition {
+  id      Int     @id @default(autoincrement()) @map("ln_condition_id")
+  nameTn  String? @map("condition_type_tn") @db.VarChar(200)
+  nameEn  String  @map("condition_type_en") @db.VarChar(200)
+
+  @@map("master_loan_condition")
+}
+
+model LoanCustomerType {
+  id     Int     @id @default(autoincrement()) @map("cus_type_id")
+  nameTn String? @map("cus_type_tn") @db.VarChar(200)
+  nameEn String? @map("cus_type_en") @db.VarChar(200)
+
+  @@map("master_loan_customer_type")
+}
+
+model TaxDeclaration {
+  id                     Int     @id @default(autoincrement())
+  branchId               Int     @default(1) @map("branch_id")
+  commodityTypeId        Int     @map("commodity_type")
+  minAmount              BigInt  @default(0) @map("min_amount")
+  maxAmount              BigInt  @map("max_amount")
+  taxPercentageGenCus    Decimal @map("tax_percentage_gen_cus") @db.Decimal(5, 2)
+  taxPercentageOtherShop Decimal @map("tax_percentage_other_shop") @db.Decimal(5, 2)
+
+  branch        Branch                @relation(fields: [branchId], references: [id])
+  commodityType CommodityMainCategory @relation(fields: [commodityTypeId], references: [id])
+
+  @@index([branchId, commodityTypeId, minAmount, maxAmount], map: "idx_tax_slab_lookup")
+  @@map("master_tax_declaration")
+}
+
+// ─── Module 1: Customer Management ─────────────────────────────────────────
+
+model Customer {
+  id                BigInt   @id @default(autoincrement())
+  customerId        BigInt   @unique @map("customer_id")
+  name              String   @db.VarChar(200)
+  fatherHusbandName String   @map("father_husband_name") @db.VarChar(200)
+  photoImage        String   @default("") @map("photo_image") @db.VarChar(500)
+  address1          String   @db.VarChar(250)
+  address2          String   @default("") @db.VarChar(250)
+  mobileNo          String   @default("") @map("mobile_no") @db.VarChar(30)
+  whatsappNo        String   @default("") @map("whatsapp_no") @db.VarChar(30)
+  email             String   @default("") @db.VarChar(200)
+  city              String   @default("") @db.VarChar(100)
+  state             String   @default("") @db.VarChar(60)
+  country           String   @default("India") @db.VarChar(100)
+  pinCode           String   @default("") @map("pin_code") @db.VarChar(10)
+  aadhaarNo         String   @default("") @map("aadhaar_no") @db.VarChar(12)
+  panNo             String   @default("") @map("pan_no") @db.VarChar(10)
+  occupation        String   @default("") @db.VarChar(200)
+  nomineeName       String   @default("") @map("nominee_name") @db.VarChar(200)
+  nomineeRelation   String   @default("") @map("nominee_relation") @db.VarChar(100)
+  nomineeMobile     String   @default("") @map("nominee_mobile") @db.VarChar(30)
+  referenceName     String   @default("") @map("reference_name") @db.VarChar(200)
+  referenceRelation String   @default("") @map("reference_relation") @db.VarChar(100)
+  referenceMobile   String   @default("") @map("reference_mobile") @db.VarChar(30)
+  isBlacklisted     Boolean   @default(false) @map("is_blacklisted")
+  blacklistReason   String    @default("") @map("blacklist_reason") @db.VarChar(500)
+  blacklistedAt     DateTime? @map("blacklisted_at")
+  preferredLanguage String    @default("en") @map("preferred_language") @db.VarChar(5)
+  isDeleted         Boolean   @default(false) @map("is_deleted")
+  createdOn         DateTime @default(now()) @map("created_on")
+  createdBy         BigInt?  @map("created_by")
+  updatedOn         DateTime @default(now()) @updatedAt @map("updated_on")
+  updatedBy         BigInt?  @map("updated_by")
+
+  loans         Loan[]
+  bankDeposits  BankDeposit[]
+  kycDocuments  CustomerKycDocument[]
+  activities    CustomerActivity[]
+
+  @@index([name], map: "idx_customer_name")
+  @@index([mobileNo])
+  @@index([isBlacklisted])
+  @@map("customer_details")
+}
+
+model CustomerKycDocument {
+  id           BigInt   @id @default(autoincrement())
+  customerId   BigInt   @map("customer_id")
+  documentType String   @map("document_type") @db.VarChar(50)
+  filePath     String   @map("file_path") @db.VarChar(500)
+  fileName     String   @map("file_name") @db.VarChar(255)
+  mimeType     String   @default("") @map("mime_type") @db.VarChar(100)
+  fileSize     Int      @default(0) @map("file_size")
+  uploadedOn   DateTime @default(now()) @map("uploaded_on")
+  uploadedBy   BigInt?  @map("uploaded_by")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
+  @@map("customer_kyc_documents")
+}
+
+model CustomerActivity {
+  id          BigInt   @id @default(autoincrement())
+  customerId  BigInt   @map("customer_id")
+  action      String   @db.VarChar(50)
+  description String   @db.VarChar(500)
+  metadata    Json?
+  performedBy Int?     @map("performed_by")
+  createdOn   DateTime @default(now()) @map("created_on")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId, createdOn])
+  @@map("customer_activities")
+}
+
+// ─── BRD: Multi-branch ─────────────────────────────────────────────────────
+
+model OrganizationSettings {
+  id                          Int      @id @default(1)
+  companyName                 String   @default("") @map("company_name") @db.VarChar(100)
+  proprietor                  String   @default("") @db.VarChar(100)
+  dashboardRefreshSeconds     Int      @default(60) @map("dashboard_refresh_seconds")
+  moduleBankLoansEnabled      Boolean  @default(false) @map("module_bank_loans_enabled")
+  moduleAuctionsEnabled       Boolean  @default(false) @map("module_auctions_enabled")
+  moduleInvestmentsEnabled    Boolean  @default(false) @map("module_investments_enabled")
+  moduleGlEnabled             Boolean  @default(false) @map("module_gl_enabled")
+  moduleNotificationsEnabled  Boolean  @default(false) @map("module_notifications_enabled")
+  sessionTimeoutMinutes       Int      @default(30) @map("session_timeout_minutes")
+  updatedOn                   DateTime @updatedAt @map("updated_on")
+
+  @@map("organization_settings")
+}
+
+model Branch {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique @db.VarChar(20)
+  name        String   @db.VarChar(100)
+  address     String   @default("") @db.VarChar(250)
+  proprietor  String   @default("") @db.VarChar(100)
+  landline    String   @default("") @db.VarChar(30)
+  phone       String   @default("") @db.VarChar(20)
+  whatsapp    String   @default("") @map("whatsapp_no") @db.VarChar(20)
+  isActive    Boolean  @default(true) @map("is_active")
+  createdOn   DateTime @default(now()) @map("created_on")
+
+  loans          Loan[]
+  users          User[]
+  glAccounts     GlAccount[]
+  journalEntries JournalEntry[]
+  investments    Investment[]
+  payAdvances    PayAdvance[]
+  notifications  Notification[]
+  incomeExpenses IncomeExpense[]
+  taxSlabs       TaxDeclaration[]
+  dailyCashBalances DailyCashBalance[]
+  cashTransfersFrom CashTransfer[] @relation("CashTransferFrom")
+  cashTransfersTo   CashTransfer[] @relation("CashTransferTo")
+  pettyCashEntries  PettyCashEntry[]
+  employees         Employee[]
+
+  @@map("branches")
+}
+
+// ─── Auth & RBAC ───────────────────────────────────────────────────────────
+
+model User {
+  id                Int      @id @default(autoincrement())
+  email             String   @unique @db.VarChar(200)
+  passwordHash      String   @map("password_hash") @db.VarChar(200)
+  name              String   @db.VarChar(200)
+  role              UserRole
+  branchId          Int?     @map("branch_id")
+  preferredLanguage String   @default("en") @map("preferred_language") @db.VarChar(5)
+  isActive          Boolean  @default(true) @map("is_active")
+  createdOn         DateTime @default(now()) @map("created_on")
+
+  branch    Branch?    @relation(fields: [branchId], references: [id])
+  auditLogs AuditLog[]
+  employee  Employee?
+
+  @@map("users")
+}
+
+model AuditLog {
+  id        BigInt   @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  action    String   @db.VarChar(100)
+  entity    String   @db.VarChar(100)
+  entityId  String?  @map("entity_id") @db.VarChar(100)
+  details   Json?
+  createdOn DateTime @default(now()) @map("created_on")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdOn])
+  @@index([createdOn])
+  @@map("audit_logs")
+}
+
+model Employee {
+  id           Int       @id @default(autoincrement())
+  employeeCode String    @unique @map("employee_code") @db.VarChar(20)
+  name         String    @db.VarChar(200)
+  mobile       String    @default("") @db.VarChar(30)
+  email        String    @default("") @db.VarChar(200)
+  designation  String    @default("") @db.VarChar(100)
+  branchId     Int?      @map("branch_id")
+  userId       Int?      @unique @map("user_id")
+  joiningDate  DateTime? @map("joining_date") @db.Date
+  isActive     Boolean   @default(true) @map("is_active")
+  isDeleted    Boolean   @default(false) @map("is_deleted")
+  createdOn    DateTime  @default(now()) @map("created_on")
+  updatedOn    DateTime  @updatedAt @map("updated_on")
+
+  branch Branch? @relation(fields: [branchId], references: [id])
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([branchId])
+  @@map("employees")
+}
+
+// ─── Module 2: Pawn Loan ───────────────────────────────────────────────────
+
+model Loan {
+  id                         BigInt    @id @default(autoincrement()) @map("lid")
+  customerId                 BigInt    @map("customer_id")
+  invoiceNo                  BigInt    @map("invoice_no")
+  billNo                     BigInt    @default(0) @map("bill_no")
+  loanDate                   DateTime  @map("loan_date") @db.Date
+  loanCondition              Int       @map("loan_condition")
+  loanConditionDeadlineMonth Int       @default(0) @map("loan_condition_deadline_month")
+  conditionTimeType          Int       @default(0) @map("condition_time_type")
+  loanCustomerType           Int       @map("loan_customer_type")
+  commodityTypeId            Int       @map("commodity_type")
+  netWeightGold              Decimal   @default(0) @map("net_weight_gold") @db.Decimal(10, 3)
+  netWeightSilver            Decimal   @default(0) @map("net_weight_silver") @db.Decimal(10, 3)
+  loanAmount                 Decimal   @map("loan_amount") @db.Decimal(12, 2)
+  loanAmountWords            String    @default("") @map("loan_amount_words") @db.VarChar(150)
+  interest                   Decimal   @db.Decimal(5, 2)
+  deadLineMonth              Int       @default(12) @map("dead_line_month")
+  summary                    String    @default("") @db.Text
+  renewalDate                DateTime  @map("renewal_date") @db.Date
+  isSettled                  Int       @default(0) @map("is_settled")
+  isBillSettled              Int       @default(0) @map("is_bill_settled")
+  oldLoanId                  String    @default("") @map("old_loan_id") @db.VarChar(250)
+  settledAmount              Decimal   @default(0) @map("settled_amount") @db.Decimal(12, 2)
+  loanSettledDate            DateTime? @map("loan_settled_date") @db.Date
+  defaultStatus              Boolean   @default(false) @map("default_status")
+  branchId                   Int       @default(1) @map("branch_id")
+  createdOn                  DateTime  @default(now()) @map("created_on")
+  updatedOn                  DateTime  @default(now()) @updatedAt @map("updated_on")
+  createdBy                  BigInt?   @map("created_by")
+  updatedBy                  BigInt?   @map("updated_by")
+
+  customer      Customer              @relation(fields: [customerId], references: [id])
+  commodityType CommodityMainCategory @relation(fields: [commodityTypeId], references: [id])
+  branch        Branch                @relation(fields: [branchId], references: [id])
+  items         LoanItem[]
+  partPayments  LoanPartPayment[]
+  bankDeposits  BankDeposit[]
+  topUpDetails  LoanTopUp[]
+  auctionNotice AuctionNotice?
+
+  @@unique([branchId, invoiceNo])
+  @@index([customerId])
+  @@index([isSettled, renewalDate])
+  @@index([loanDate])
+  @@index([branchId])
+  @@map("loan_details")
+}
+
+model LoanItem {
+  id            BigInt  @id @default(autoincrement())
+  loanId        BigInt  @map("lid")
+  itemId        BigInt  @map("item_id")
+  subCategoryId Int     @map("commodity_sub_type")
+  purityId      Int     @map("purity_id")
+  noOfItems     Int     @map("no_of_items")
+  netWeight     Decimal @map("net_weight") @db.Decimal(10, 3)
+
+  loan        Loan                 @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  item        CommoditySubItem     @relation(fields: [itemId], references: [id])
+  subCategory CommoditySubCategory @relation(fields: [subCategoryId], references: [id])
+  purity      Purity               @relation(fields: [purityId], references: [id])
+  inventoryMeta InventoryMeta?
+
+  @@index([loanId])
+  @@map("loan_item_details")
+}
+
+// ─── Module 3–5: Interest, partial pay, bank re-pledge, renewal ─────────────
+
+model LoanPartPayment {
+  id        BigInt   @id @default(autoincrement()) @map("p_id")
+  loanId    BigInt   @map("lid")
+  amount    Decimal  @db.Decimal(15, 2)
+  payDate   DateTime @map("pay_date") @db.Date
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy BigInt?  @map("created_by")
+
+  loan Loan @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  @@index([loanId])
+  @@map("loan_part_payment")
+}
+
+model BankDeposit {
+  id            BigInt    @id @default(autoincrement()) @map("bid")
+  customerId    BigInt?   @map("customer_id")
+  loanId        BigInt    @map("bill_id")
+  bankName      String    @map("bank_name") @db.VarChar(200)
+  receiptNo     String    @default("") @map("receipt_no") @db.VarChar(200)
+  depositAmount Decimal   @map("deposit_amount") @db.Decimal(12, 2)
+  depositDate   DateTime? @map("deposit_date") @db.Date
+  closingDate   DateTime? @map("closing_date") @db.Date
+  isBankSettled Boolean   @default(false) @map("is_bank_settled")
+  createdOn     DateTime  @default(now()) @map("created_on")
+  createdBy     BigInt?   @map("created_by")
+
+  customer Customer? @relation(fields: [customerId], references: [id])
+  loan     Loan      @relation(fields: [loanId], references: [id])
+
+  @@index([loanId, isBankSettled])
+  @@map("bank_deposit_details")
+}
+
+model LoanTopUp {
+  id               BigInt   @id @default(autoincrement()) @map("t_id")
+  loanId           BigInt   @map("lid")
+  topupAmt         Decimal  @default(0) @map("topup_amt") @db.Decimal(15, 2)
+  closeAmt         Decimal  @default(0) @map("close_amt") @db.Decimal(15, 2)
+  interestAmt      Decimal  @default(0) @map("interest_amt") @db.Decimal(15, 2)
+  interestDisAmt   Decimal  @default(0) @map("interest_dis_amt") @db.Decimal(15, 2)
+  totMonth         Decimal  @default(0) @map("tot_month") @db.Decimal(15, 2)
+  totPayAmt        Decimal  @default(0) @map("tot_pay_amt") @db.Decimal(15, 2)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  loan Loan @relation(fields: [loanId], references: [id])
+
+  @@index([loanId])
+  @@map("loan_top_up_details")
+}
+
+// ─── Module 6: Auction ─────────────────────────────────────────────────────
+
+model AuctionNotice {
+  id                   BigInt    @id @default(autoincrement())
+  loanId               BigInt    @unique @map("lid")
+  noticeDate           DateTime  @map("notice_date") @db.Date
+  auctionDate          DateTime? @map("auction_date") @db.Date
+  redemptionDate       DateTime? @map("redemption_date") @db.Date
+  status               String    @default("pending") @db.VarChar(30)
+  saleAmount           Decimal?  @map("sale_amount") @db.Decimal(15, 2)
+  buyerName            String?   @map("buyer_name") @db.VarChar(200)
+  auctionCharges       Decimal   @default(0) @map("auction_charges") @db.Decimal(15, 2)
+  penaltyAmount        Decimal   @default(0) @map("penalty_amount") @db.Decimal(15, 2)
+  interestOwed         Decimal?  @map("interest_owed") @db.Decimal(15, 2)
+  principalOutstanding Decimal?  @map("principal_outstanding") @db.Decimal(15, 2)
+  surplusRefund        Decimal?  @map("surplus_refund") @db.Decimal(15, 2)
+  deficitAmount        Decimal?  @map("deficit_amount") @db.Decimal(15, 2)
+  refundStatus         String?   @map("refund_status") @db.VarChar(30)
+  refundPaidOn         DateTime? @map("refund_paid_on")
+  legalNoticeSent      Boolean   @default(false) @map("legal_notice_sent")
+  advertisementSent    Boolean   @default(false) @map("advertisement_sent")
+  completedOn          DateTime? @map("completed_on")
+  createdOn            DateTime  @default(now()) @map("created_on")
+
+  loan Loan @relation(fields: [loanId], references: [id])
+
+  @@map("auction_notices")
+}
+
+// ─── Module 8: Accounts (daily book) ───────────────────────────────────────
+
+model IncomeExpense {
+  id          Int      @id @default(autoincrement()) @map("in_id")
+  userName    String   @map("user_name") @db.VarChar(200)
+  description String   @map("exp_description") @db.VarChar(250)
+  category    Int      @map("exp_category")
+  amount      Decimal  @db.Decimal(15, 2)
+  entryDate   DateTime @map("entry_date") @db.Date
+  branchId    Int      @default(1) @map("branch_id")
+  createdOn   DateTime @default(now()) @map("created_on")
+  createdBy   BigInt?  @map("created_by")
+
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  @@index([entryDate])
+  @@map("income_expenses_master")
+}
+
+model DailyCashBalance {
+  id             Int       @id @default(autoincrement())
+  branchId       Int       @map("branch_id")
+  balanceDate    DateTime  @map("balance_date") @db.Date
+  openingBalance Decimal   @default(0) @map("opening_balance") @db.Decimal(15, 2)
+  closingBalance Decimal?  @map("closing_balance") @db.Decimal(15, 2)
+  vaultCash      Decimal   @default(0) @map("vault_cash") @db.Decimal(15, 2)
+  counterCash    Decimal   @default(0) @map("counter_cash") @db.Decimal(15, 2)
+  physicalCount  Decimal?  @map("physical_count") @db.Decimal(15, 2)
+  isClosed       Boolean   @default(false) @map("is_closed")
+  closedOn       DateTime? @map("closed_on")
+  closedBy       Int?      @map("closed_by")
+  notes          String    @default("") @db.VarChar(500)
+
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@unique([branchId, balanceDate])
+  @@map("daily_cash_balances")
+}
+
+model CashTransfer {
+  id           Int      @id @default(autoincrement())
+  fromBranchId Int      @map("from_branch_id")
+  toBranchId   Int      @map("to_branch_id")
+  amount       Decimal  @db.Decimal(15, 2)
+  transferDate DateTime @map("transfer_date") @db.Date
+  description  String   @default("") @db.VarChar(500)
+  createdOn    DateTime @default(now()) @map("created_on")
+  createdBy    Int?     @map("created_by")
+
+  fromBranch Branch @relation("CashTransferFrom", fields: [fromBranchId], references: [id])
+  toBranch   Branch @relation("CashTransferTo", fields: [toBranchId], references: [id])
+
+  @@index([transferDate])
+  @@map("cash_transfers")
+}
+
+model PettyCashEntry {
+  id          Int      @id @default(autoincrement())
+  branchId    Int      @map("branch_id")
+  entryType   String   @map("entry_type") @db.VarChar(30)
+  amount      Decimal  @db.Decimal(15, 2)
+  description String   @db.VarChar(500)
+  entryDate   DateTime @map("entry_date") @db.Date
+  createdOn   DateTime @default(now()) @map("created_on")
+  createdBy   Int?     @map("created_by")
+
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@index([branchId, entryDate])
+  @@map("petty_cash_entries")
+}
+
+model InventoryMeta {
+  loanItemId BigInt  @id @map("loan_item_id")
+  barcode    String? @db.VarChar(50)
+  qrCode     String? @map("qr_code") @db.VarChar(100)
+  location   String? @db.VarChar(100)
+  lockerNo   String? @map("locker_no") @db.VarChar(50)
+  photoUrl   String? @map("photo_url") @db.VarChar(500)
+  itemStatus String? @map("item_status") @db.VarChar(30)
+  notes      String  @default("") @db.VarChar(500)
+
+  loanItem LoanItem @relation(fields: [loanItemId], references: [id], onDelete: Cascade)
+
+  @@index([barcode])
+  @@index([qrCode])
+  @@map("inventory_meta")
+}
+
+// ─── GL Accounting ─────────────────────────────────────────────────────────
+
+model GlAccount {
+  id          Int    @id @default(autoincrement())
+  branchId    Int    @default(1) @map("branch_id")
+  code        String @db.VarChar(20)
+  nameEn      String @map("name_en") @db.VarChar(200)
+  nameTa      String @map("name_ta") @db.VarChar(200)
+  accountType String @map("account_type") @db.VarChar(30)
+
+  branch Branch        @relation(fields: [branchId], references: [id])
+  lines  JournalLine[]
+
+  @@unique([branchId, code])
+  @@map("gl_accounts")
+}
+
+model JournalEntry {
+  id            BigInt   @id @default(autoincrement())
+  branchId      Int      @map("branch_id")
+  entryDate     DateTime @map("entry_date") @db.Date
+  description   String   @db.VarChar(500)
+  referenceType String?  @map("reference_type") @db.VarChar(50)
+  referenceId   String?  @map("reference_id") @db.VarChar(100)
+  createdOn     DateTime @default(now()) @map("created_on")
+  createdBy     Int?     @map("created_by")
+
+  branch Branch        @relation(fields: [branchId], references: [id])
+  lines  JournalLine[]
+
+  @@index([branchId, entryDate])
+  @@map("journal_entries")
+}
+
+model JournalLine {
+  id             BigInt  @id @default(autoincrement())
+  journalEntryId BigInt  @map("journal_entry_id")
+  accountId      Int     @map("account_id")
+  debit          Decimal @default(0) @db.Decimal(15, 2)
+  credit         Decimal @default(0) @db.Decimal(15, 2)
+
+  journalEntry JournalEntry @relation(fields: [journalEntryId], references: [id], onDelete: Cascade)
+  account      GlAccount    @relation(fields: [accountId], references: [id])
+
+  @@index([journalEntryId])
+  @@map("journal_lines")
+}
+
+// ─── Investment & Pay Advance ──────────────────────────────────────────────
+
+model Investment {
+  id             Int      @id @default(autoincrement())
+  branchId       Int      @default(1) @map("branch_id")
+  investorType   String   @map("investor_type") @db.VarChar(30)
+  investorName   String   @map("investor_name") @db.VarChar(200)
+  amount         Decimal  @db.Decimal(15, 2)
+  investmentDate DateTime @map("investment_date") @db.Date
+  purpose        String   @default("") @db.VarChar(500)
+  profitSharePct Decimal  @default(0) @map("profit_share_pct") @db.Decimal(5, 2)
+  status         String   @default("active") @db.VarChar(30)
+  createdOn      DateTime @default(now()) @map("created_on")
+  createdBy      Int?     @map("created_by")
+
+  branch Branch @relation(fields: [branchId], references: [id])
+  transactions InvestmentTransaction[]
+
+  @@index([branchId, status])
+  @@map("investments")
+}
+
+model InvestmentTransaction {
+  id           Int      @id @default(autoincrement())
+  investmentId Int      @map("investment_id")
+  txnType      String   @map("txn_type") @db.VarChar(30)
+  amount       Decimal  @db.Decimal(15, 2)
+  txnDate      DateTime @map("txn_date") @db.Date
+  notes        String   @default("") @db.VarChar(500)
+  createdOn    DateTime @default(now()) @map("created_on")
+
+  investment Investment @relation(fields: [investmentId], references: [id], onDelete: Cascade)
+
+  @@index([investmentId])
+  @@map("investment_transactions")
+}
+
+model PayAdvance {
+  id          Int       @id @default(autoincrement())
+  branchId    Int       @map("branch_id")
+  advanceType String    @map("advance_type") @db.VarChar(30)
+  partyName   String    @map("party_name") @db.VarChar(200)
+  amount      Decimal   @db.Decimal(15, 2)
+  balance     Decimal   @db.Decimal(15, 2)
+  advanceDate DateTime  @map("advance_date") @db.Date
+  dueDate     DateTime? @map("due_date") @db.Date
+  purpose     String    @default("") @db.VarChar(500)
+  status      String    @default("pending") @db.VarChar(30)
+  createdOn   DateTime  @default(now()) @map("created_on")
+  createdBy   Int?      @map("created_by")
+
+  branch Branch @relation(fields: [branchId], references: [id])
+  recoveries PayAdvanceRecovery[]
+
+  @@index([branchId, status])
+  @@map("pay_advances")
+}
+
+model PayAdvanceRecovery {
+  id           Int      @id @default(autoincrement())
+  payAdvanceId Int      @map("pay_advance_id")
+  amount       Decimal  @db.Decimal(15, 2)
+  recoveryDate DateTime @map("recovery_date") @db.Date
+  notes        String   @default("") @db.VarChar(500)
+  createdOn    DateTime @default(now()) @map("created_on")
+
+  payAdvance PayAdvance @relation(fields: [payAdvanceId], references: [id], onDelete: Cascade)
+
+  @@index([payAdvanceId])
+  @@map("pay_advance_recoveries")
+}
+
+// ─── Notifications ───────────────────────────────────────────────────────
+
+model NotificationTemplate {
+  id        Int    @id @default(autoincrement())
+  key       String @unique @db.VarChar(100)
+  channel   String @db.VarChar(20)
+  subjectEn String? @map("subject_en") @db.VarChar(500)
+  subjectTa String? @map("subject_ta") @db.VarChar(500)
+  bodyEn    String @map("body_en") @db.Text
+  bodyTa    String @map("body_ta") @db.Text
+
+  @@map("notification_templates")
+}
+
+model Notification {
+  id          BigInt    @id @default(autoincrement())
+  branchId    Int?      @map("branch_id")
+  customerId  BigInt?   @map("customer_id")
+  loanId      BigInt?   @map("loan_id")
+  channel     String    @db.VarChar(20)
+  language    String    @default("en") @db.VarChar(5)
+  recipient   String    @db.VarChar(200)
+  subject     String?   @db.VarChar(500)
+  body        String    @db.Text
+  status      String    @default("pending") @db.VarChar(30)
+  templateKey String?   @map("template_key") @db.VarChar(100)
+  createdOn   DateTime  @default(now()) @map("created_on")
+  sentOn      DateTime? @map("sent_on")
+
+  branch Branch? @relation(fields: [branchId], references: [id])
+
+  @@index([status, createdOn])
+  @@map("notifications")
+}

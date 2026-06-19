@@ -1,0 +1,181 @@
+{
+  "app_name": "Pawn ERP",
+  "nav": {
+    "dashboard": "Dashboard",
+    "customers": "Customers",
+    "loans": "Loan",
+    "bank_loan": "Bank Loan",
+    "interest": "Part payment",
+    "renewals": "Renewal",
+    "repledges": "Repledge",
+    "auctions": "Auction",
+    "inventory": "Inventory",
+    "accounts": "Accounts",
+    "reports": "Reports",
+    "investments": "Investments",
+    "gl": "General Ledger",
+    "notifications": "Notifications",
+    "pay_advances": "Pay Advances",
+    "masters": "Master Data",
+    "branches": "Branches",
+    "settings": "Settings"
+  },
+  "branches": {
+    "title": "Branches",
+    "subtitle": "Create and manage pawn shop branches",
+    "add_title": "Add branch",
+    "edit_title": "Edit branch profile",
+    "add_button": "Create branch",
+    "save_button": "Save changes",
+    "list_title": "All branches",
+    "profile_hint": "Branch address and contact numbers appear on loan receipts for this location.",
+    "fields": {
+      "code": "Branch code",
+      "company_name": "Company / shop name",
+      "address": "Address",
+      "proprietor": "Proprietor",
+      "landline": "Landline",
+      "mobile": "Mobile",
+      "whatsapp": "WhatsApp",
+      "phone": "Mobile",
+      "status": "Status"
+    },
+    "status_active": "Active",
+    "status_inactive": "Inactive",
+    "errors": {
+      "required": "Code and name are required"
+    }
+  },
+  "actions": {
+    "login": "Sign in",
+    "logout": "Sign out",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search",
+    "reloan": "Easy Reloan",
+    "new_loan": "New Loan",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "confirm": {
+    "delete_title": "Delete?",
+    "delete_message": "This action cannot be undone."
+  },
+  "branch": "Branch",
+  "language": "Language",
+  "loading": "Loading…",
+  "select": "Select…",
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "pagination": {
+    "page_of": "Page {{page}} of {{totalPages}}",
+    "results": "{{count}} results",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "errors": {
+    "save_failed": "Save failed"
+  },
+  "login": {
+    "title": "Sign in to Pawn ERP",
+    "email": "Email",
+    "password": "Password"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Branch overview and key metrics",
+    "daily": "Today",
+    "monthly": "This month",
+    "widgets": "Alerts & stock",
+    "branch_performance": "Branch performance",
+    "new_customers": "New customers (today)",
+    "new_loans": "New loans (today)",
+    "cash_in_hand": "Cash in hand",
+    "interest_collection": "Interest collected (today)",
+    "auction_alerts": "Auction alerts",
+    "today_income": "Today's income",
+    "today_expense": "Expenses (today)",
+    "today_net": "Today's net",
+    "revenue": "Income",
+    "profit": "Monthly profit",
+    "investments": "Investments",
+    "gold_stock": "Gold stock",
+    "silver_stock": "Silver stock",
+    "pending_renewals": "Pending renewals",
+    "bank_repledges": "Bank re-pledges",
+    "auction_notices": "Auction notices",
+    "open_loans": "Open loans",
+    "overdue": "Overdue",
+    "outstanding": "Outstanding loans",
+    "grams": "g",
+    "loans": "loans",
+    "partial_payments": "Partial payments",
+    "released_loans": "Released loans (today)",
+    "bank_balance": "Bank balance",
+    "bank_pledged_stock": "Bank pledged",
+    "auction_stock": "Auction stock",
+    "released_stock": "Released",
+    "due_today": "Due today",
+    "renewal_due": "Renewal due",
+    "npa": "NPA",
+    "auction_eligible": "Auction eligible",
+    "active_banks": "Active banks",
+    "batches": "Batches",
+    "bank_outstanding": "Outstanding",
+    "maturity_month": "Maturity this month",
+    "bank_overdue": "Overdue",
+    "legal_waiting": "Legal waiting",
+    "auction_scheduled": "Scheduled",
+    "auction_completed": "Completed",
+    "insights_title": "Today's observations",
+    "auto_refresh_info": "Dashboard data auto-refreshes every {{seconds}} seconds.",
+    "sections": {
+      "quick_actions": "Quick Actions",
+      "today_ops": "Today's Operations",
+      "financial": "Financial Snapshot",
+      "inventory": "Inventory & Gold Stock",
+      "portfolio": "Loan Portfolio",
+      "bank_repledge": "Bank Re-Pledge",
+      "auction_mgmt": "Auction Management",
+      "charts": "Charts",
+      "alerts": "Alerts",
+      "insights": "AI Insights",
+      "activity": "Real-Time Activity",
+      "kpi": "KPI Progress",
+      "branch_map": "Branch Map"
+    },
+    "actions": {
+      "new_loan": "New Loan",
+      "renew_loan": "Renew Loan",
+      "interest": "Interest Payment",
+      "close_loan": "Close Loan",
+      "bank": "Bank Re-Pledge",
+      "auction": "Auction",
+      "customer": "Customer"
+    },
+    "chart": {
+      "daily_collections": "Daily Collections",
+      "loan_trend": "Loan Trend",
+      "gold_silver": "Gold vs Silver",
+      "income_expense": "Income vs Expense",
+      "branch_compare": "Branch Comparison",
+      "loan_status": "Loan Status",
+      "item_dist": "Item Distribution"
+    },
+    "col": {
+      "branch": "Branch",
+      "loans": "Loans",
+      "interest": "Interest",
+      "cash": "Cash",
+      "outstanding": "Outstanding"
+    },
+    "kpi": {
+      "loans": "Loans",
+      "interest": "Interest",
+      "profit": "Profit"
+    }
+  }
+}

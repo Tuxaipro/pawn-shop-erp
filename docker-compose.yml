@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pawn-erp-db
+    environment:
+      POSTGRES_USER: pawn
+      POSTGRES_PASSWORD: pawn
+      POSTGRES_DB: pawn_erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pawn_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pawn -d pawn_erp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pawn_pg_data:

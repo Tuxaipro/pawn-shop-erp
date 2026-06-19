@@ -1,0 +1,80 @@
+{
+  "title": "Master Data",
+  "subtitle": "Commodity hierarchy and interest rate slabs",
+  "nav": {
+    "categories": "Commodity Category",
+    "sub_categories": "Sub Category",
+    "sub_items": "Sub Item / Division",
+    "interest": "Interest Declaration",
+    "employees": "Employee Management"
+  },
+  "fields": {
+    "name": "Name",
+    "name_en": "Name (English)",
+    "name_ta": "Name (Tamil)",
+    "status": "Status",
+    "category": "Commodity Category",
+    "sub_category": "Sub Category",
+    "select_category": "Select category…",
+    "select_sub_category": "Select sub category…",
+    "all_categories": "All categories",
+    "all_sub_categories": "All sub categories",
+    "min_amount": "Min amount",
+    "max_amount": "Max amount",
+    "general_rate": "General customer rate",
+    "other_shop_rate": "Other shop rate"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "actions": {
+    "add": "Add",
+    "add_slab": "Add slab",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "edit_rates": "Edit rates"
+  },
+  "confirm": {
+    "delete": "Delete this record? It will be soft-deleted."
+  },
+  "categories": {
+    "add_title": "Add commodity category",
+    "list_title": "Commodity categories"
+  },
+  "sub_categories": {
+    "add_title": "Add sub category",
+    "list_title": "Sub categories"
+  },
+  "sub_items": {
+    "add_title": "Add sub item / division",
+    "list_title": "Sub items"
+  },
+  "interest": {
+    "add_title": "Add interest slab",
+    "list_title": "Interest slabs",
+    "hint": "Amount ranges are fixed after creation. Only rates can be edited later.",
+    "select_category_first": "Select a commodity category to view slabs.",
+    "branch_hint": "Managing interest slabs for branch: {{branch}}. Use the branch selector in the header to switch."
+  },
+  "employees": {
+    "add_title": "Add employee",
+    "edit_title": "Edit employee",
+    "list_title": "Employees",
+    "code": "Employee code",
+    "name": "Name",
+    "designation": "Designation",
+    "mobile": "Mobile",
+    "email": "Email",
+    "branch": "Branch",
+    "no_branch": "No branch",
+    "system_user": "Linked system user",
+    "no_user": "No linked user",
+    "joining_date": "Joining date",
+    "required": "Employee code and name are required."
+  }
+}

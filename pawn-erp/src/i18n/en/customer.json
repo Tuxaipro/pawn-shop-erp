@@ -1,0 +1,105 @@
+{
+  "title_new": "New Customer",
+  "title_edit": "Edit Customer",
+  "subtitle": "Customer profile with KYC and contact details",
+  "sections": {
+    "identity": "Identity",
+    "contact": "Contact",
+    "address": "Address",
+    "kyc": "KYC & IDs",
+    "nominee": "Nominee",
+    "reference": "Reference",
+    "relations": "Nominee & Reference",
+    "status": "Status"
+  },
+  "fields": {
+    "customer_id": "Customer ID",
+    "name": "Customer Name",
+    "father_husband": "Father / Husband Name",
+    "photo": "Photo",
+    "occupation": "Occupation",
+    "mobile": "Mobile No",
+    "whatsapp": "WhatsApp No",
+    "email": "Email",
+    "address1": "Address Line 1",
+    "address2": "Address Line 2",
+    "city": "City",
+    "state": "State",
+    "postal_code": "Postal Code",
+    "country": "Country",
+    "aadhaar": "Aadhaar No",
+    "pan": "PAN No",
+    "nominee_name": "Nominee Name",
+    "nominee_relation": "Relation",
+    "nominee_mobile": "Nominee Mobile",
+    "reference_name": "Reference Name",
+    "reference_relation": "Relation",
+    "reference_mobile": "Reference Mobile",
+    "blacklisted": "Blacklist customer",
+    "blacklisted_status": "Blacklisted",
+    "blacklist_reason": "Blacklist reason",
+    "blacklist_reason_placeholder": "Enter reason for blacklisting…",
+    "blacklisted_at": "Blacklisted on"
+  },
+  "photo": {
+    "upload": "Upload file",
+    "camera": "Take photo",
+    "capture": "Capture",
+    "cancel_camera": "Cancel",
+    "preview": "Photo preview",
+    "no_photo": "No photo yet"
+  },
+  "kyc": {
+    "title": "KYC Documents",
+    "type": "Document type",
+    "upload": "Upload document",
+    "types": {
+      "aadhaar": "Aadhaar",
+      "pan": "PAN card",
+      "address_proof": "Address proof",
+      "photo_id": "Photo ID",
+      "other": "Other"
+    },
+    "no_documents": "No documents uploaded",
+    "confirm_delete": "Remove this KYC document?"
+  },
+  "confirm": {
+    "delete": "Delete customer {{name}}? This cannot be undone."
+  },
+  "blacklist_warning": "Blacklisted customers cannot receive new loans.",
+  "blacklist_reason_required": "Please enter a reason when blacklisting a customer.",
+  "activity": {
+    "title": "Activity log",
+    "loading": "Loading activity…",
+    "empty": "No activity recorded yet.",
+    "actions": {
+      "created": "Profile created",
+      "updated": "Profile updated",
+      "blacklisted": "Blacklisted",
+      "unblacklisted": "Removed from blacklist",
+      "blacklist_updated": "Blacklist reason updated",
+      "photo_uploaded": "Photo uploaded",
+      "kyc_uploaded": "KYC document uploaded",
+      "kyc_deleted": "KYC document deleted",
+      "deleted": "Profile deleted"
+    }
+  },
+  "save": "Save Customer",
+  "saving": "Saving…",
+  "change": "Change",
+  "list": {
+    "title": "All customers",
+    "search_name": "Search by name…",
+    "search_mobile": "Mobile…",
+    "loading": "Loading customers…",
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "father_husband": "Father/Husband",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Active"
+    }
+  }
+}

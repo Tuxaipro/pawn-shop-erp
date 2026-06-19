@@ -1,0 +1,181 @@
+{
+  "app_name": "பண அட்டவணை",
+  "nav": {
+    "dashboard": "டாஷ்போர்டு",
+    "customers": "வாடிக்கையாளர்கள்",
+    "loans": "கடன்",
+    "bank_loan": "வங்கி கடன்",
+    "interest": "பகுதி கட்டணம்",
+    "renewals": "புதுப்பிப்பு",
+    "repledges": "வங்கி அடமானம்",
+    "auctions": "விற்பனை",
+    "inventory": "சரக்கு",
+    "accounts": "கணக்குகள்",
+    "reports": "அறிக்கைகள்",
+    "investments": "முதலீடுகள்",
+    "gl": "பொது கணக்கு",
+    "notifications": "அறிவிப்புகள்",
+    "pay_advances": "முன்பணம்",
+    "masters": "மாஸ்டர் தரவு",
+    "branches": "கிளைகள்",
+    "settings": "அமைப்புகள்"
+  },
+  "branches": {
+    "title": "கிளைகள்",
+    "subtitle": "அடமான கடை கிளைகளை உருவாக்கி நிர்வகிக்கவும்",
+    "add_title": "கிளை சேர்",
+    "edit_title": "கிளை விவரங்களைத் திருத்து",
+    "add_button": "கிளை உருவாக்கு",
+    "save_button": "மாற்றங்களை சேமி",
+    "list_title": "அனைத்து கிளைகள்",
+    "profile_hint": "இந்த கிளையின் முகவரி மற்றும் தொடர்பு எண்கள் கடன் ரசீதுகளில் காட்டப்படும்.",
+    "fields": {
+      "code": "கிளை குறியீடு",
+      "company_name": "நிறுவன / கடை பெயர்",
+      "address": "முகவரி",
+      "proprietor": "உரிமையாளர்",
+      "landline": "லேண்ட்லைன்",
+      "mobile": "கைபேசி",
+      "whatsapp": "வாட்ஸ்அப்",
+      "phone": "கைபேசி",
+      "status": "நிலை"
+    },
+    "status_active": "செயலில்",
+    "status_inactive": "செயலற்ற",
+    "errors": {
+      "required": "குறியீடு மற்றும் பெயர் அவசியம்"
+    }
+  },
+  "actions": {
+    "login": "உள்நுழை",
+    "logout": "வெளியேறு",
+    "save": "சேமி",
+    "cancel": "ரத்து",
+    "search": "தேடு",
+    "reloan": "எளிய மறுகடன்",
+    "new_loan": "புதிய கடன்",
+    "edit": "திருத்து",
+    "delete": "நீக்கு"
+  },
+  "confirm": {
+    "delete_title": "நீக்கவா?",
+    "delete_message": "இந்த செயலை மீளமுடியாது."
+  },
+  "branch": "கிளை",
+  "language": "மொழி",
+  "loading": "சுமைப்படுத்துகிறது…",
+  "select": "தேர்ந்தெடு…",
+  "greeting": {
+    "morning": "காலை வணக்கம்",
+    "afternoon": "மதிய வணக்கம்",
+    "evening": "மாலை வணக்கம்"
+  },
+  "pagination": {
+    "page_of": "பக்கம் {{page}} / {{totalPages}}",
+    "results": "{{count}} முடிவுகள்",
+    "previous": "முந்தைய",
+    "next": "அடுத்து"
+  },
+  "errors": {
+    "save_failed": "சேமிப்பு தோல்வி"
+  },
+  "login": {
+    "title": "பண அட்டவணையில் உள்நுழையுங்கள்",
+    "email": "மின்னஞ்சல்",
+    "password": "கடவுச்சொல்"
+  },
+  "dashboard": {
+    "title": "டாஷ்போர்டு",
+    "subtitle": "கிளை சுருக்கம் மற்றும் முக்கிய அளவீடுகள்",
+    "daily": "இன்று",
+    "monthly": "இந்த மாதம்",
+    "widgets": "எச்சரிக்கைகள் & சரக்கு",
+    "branch_performance": "கிளை செயல்திறன்",
+    "new_customers": "புதிய வாடிக்கையாளர்கள் (இன்று)",
+    "new_loans": "புதிய கடன்கள் (இன்று)",
+    "cash_in_hand": "கையில் பணம்",
+    "interest_collection": "வட்டி வசூல் (இன்று)",
+    "auction_alerts": "வேலை எச்சரிக்கை",
+    "today_income": "இன்றைய வருமானம்",
+    "today_expense": "செலவுகள் (இன்று)",
+    "today_net": "இன்றைய நிகரம்",
+    "revenue": "வருமானம்",
+    "profit": "மாதாந்திர லாபம்",
+    "investments": "முதலீடுகள்",
+    "gold_stock": "தங்க சரக்கு",
+    "silver_stock": "வெள்ளி சரக்கு",
+    "pending_renewals": "நிலுவை புதுப்பிப்புகள்",
+    "bank_repledges": "வங்கி அடமானங்கள்",
+    "auction_notices": "வேலை அறிவிப்புகள்",
+    "open_loans": "திறந்த கடன்கள்",
+    "overdue": "காலாவதி",
+    "outstanding": "நிலுவை கடன்கள்",
+    "grams": "கி",
+    "loans": "கடன்கள்",
+    "partial_payments": "பகுதி கொடுப்பனவுகள்",
+    "released_loans": "விடுவிக்கப்பட்ட கடன்கள் (இன்று)",
+    "bank_balance": "வங்கி இருப்பு",
+    "bank_pledged_stock": "வங்கி அடமானம்",
+    "auction_stock": "வேலை சரக்கு",
+    "released_stock": "விடுவிக்கப்பட்டது",
+    "due_today": "இன்று காலம்",
+    "renewal_due": "புதுப்பிப்பு காலம்",
+    "npa": "NPA",
+    "auction_eligible": "வேலைக்கு தகுதி",
+    "active_banks": "செயலில் வங்கிகள்",
+    "batches": "தொகுப்புகள்",
+    "bank_outstanding": "நிலுவை",
+    "maturity_month": "இந்த மாதம் முதிர்வு",
+    "bank_overdue": "காலாவதி",
+    "legal_waiting": "சட்ட அறிவிப்பு நிலுவை",
+    "auction_scheduled": "திட்டமிடப்பட்டது",
+    "auction_completed": "முடிந்தது",
+    "insights_title": "இன்றைய கவனிப்புகள்",
+    "auto_refresh_info": "டாஷ்போர்டு தரவு ஒவ்வொரு {{seconds}} வினாடிகளுக்கும் தானாக புதுப்பிக்கப்படும்.",
+    "sections": {
+      "quick_actions": "விரைவு செயல்கள்",
+      "today_ops": "இன்றைய செயல்பாடுகள்",
+      "financial": "நிதி சுருக்கம்",
+      "inventory": "சரக்கு & தங்கம்",
+      "portfolio": "கடன் போர்ட்ஃபோலியோ",
+      "bank_repledge": "வங்கி மறு-அடமானம்",
+      "auction_mgmt": "வேலை மேலாண்மை",
+      "charts": "வரைபடங்கள்",
+      "alerts": "எச்சரிக்கைகள்",
+      "insights": "நுண்ணறிவு",
+      "activity": "நேரடி செயல்பாடு",
+      "kpi": "KPI முன்னேற்றம்",
+      "branch_map": "கிளை வரைபடம்"
+    },
+    "actions": {
+      "new_loan": "புதிய கடன்",
+      "renew_loan": "கடன் புதுப்பிப்பு",
+      "interest": "வட்டி கொடுப்பனவு",
+      "close_loan": "கடன் மூடுதல்",
+      "bank": "வங்கி மறு-அடமானம்",
+      "auction": "வேலை",
+      "customer": "வாடிக்கையாளர்"
+    },
+    "chart": {
+      "daily_collections": "தினசரி வசூல்",
+      "loan_trend": "கடன் போக்கு",
+      "gold_silver": "தங்கம் vs வெள்ளி",
+      "income_expense": "வருமானம் vs செலவு",
+      "branch_compare": "கிளை ஒப்பீடு",
+      "loan_status": "கடன் நிலை",
+      "item_dist": "பொருள் பகிர்வு"
+    },
+    "col": {
+      "branch": "கிளை",
+      "loans": "கடன்கள்",
+      "interest": "வட்டி",
+      "cash": "பணம்",
+      "outstanding": "நிலுவை"
+    },
+    "kpi": {
+      "loans": "கடன்கள்",
+      "interest": "வட்டி",
+      "profit": "லாபம்"
+    }
+  }
+}

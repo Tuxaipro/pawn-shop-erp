@@ -1,0 +1,186 @@
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { Layout } from './components/Layout';
+import { OptionalModuleRoute } from './components/OptionalModuleRoute';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { BranchProvider } from './context/BranchContext';
+import { ModuleSettingsProvider } from './context/ModuleSettingsContext';
+import { AccountsPage } from './pages/accounts/AccountsPage';
+import { SettingsBranchesPage } from './pages/settings/SettingsBranchesPage';
+import { OrganizationSettingsPage } from './pages/settings/OrganizationSettingsPage';
+import { ApplicationSettingsPage } from './pages/settings/ApplicationSettingsPage';
+import {
+  SecurityIndexRedirect,
+  SecurityLayout,
+} from './pages/settings/SecurityLayout';
+import { UsersSettingsPage } from './pages/settings/UsersSettingsPage';
+import { RolePermissionsPage } from './pages/settings/RolePermissionsPage';
+import { AuditLogPage } from './pages/settings/AuditLogPage';
+import { SettingsIndexRedirect, SettingsLayout } from './pages/settings/SettingsLayout';
+import { LoanBankLoanPage } from './pages/loans/LoanBankLoanPage';
+import { LoanClosePage } from './pages/loans/LoanClosePage';
+import { AuctionsPage } from './pages/auctions/AuctionsPage';
+import { CustomerCreatePage } from './pages/customers/CustomerCreatePage';
+import { CustomerDetailPage } from './pages/customers/CustomerDetailPage';
+import { CustomerEditPage } from './pages/customers/CustomerEditPage';
+import { CustomerListPage } from './pages/customers/CustomerListPage';
+import { DashboardPage } from './pages/DashboardPage';
+import { GlPage } from './pages/gl/GlPage';
+import { BankLoanLayout } from './pages/bank-loans/BankLoanLayout';
+import { BankLoanListPage } from './pages/bank-loans/BankLoanListPage';
+import { BankLoanBatchPage } from './pages/bank-loans/BankLoanBatchPage';
+import { BankLoanRecordPage } from './pages/bank-loans/BankLoanRecordPage';
+import { PartPaymentLayout } from './pages/part-payments/PartPaymentLayout';
+import { PartPaymentListPage } from './pages/part-payments/PartPaymentListPage';
+import { PartPaymentRecordPage } from './pages/part-payments/PartPaymentRecordPage';
+import { InventoryPage } from './pages/inventory/InventoryPage';
+import { InvestmentsPage } from './pages/investments/InvestmentsPage';
+import { LoanCreatePage } from './pages/loans/LoanCreatePage';
+import { LoanDetailPage } from './pages/loans/LoanDetailPage';
+import { LoanEditPage } from './pages/loans/LoanEditPage';
+import { LoanListPage } from './pages/loans/LoanListPage';
+import { LoanPrintPage } from './pages/loans/LoanPrintPage';
+import { LoginPage } from './pages/LoginPage';
+import { NotificationsPage } from './pages/notifications/NotificationsPage';
+import { PayAdvancesPage } from './pages/pay-advances/PayAdvancesPage';
+import { RenewalLayout } from './pages/renewals/RenewalLayout';
+import { RenewalListPage } from './pages/renewals/RenewalListPage';
+import { RenewalRecordPage } from './pages/renewals/RenewalRecordPage';
+import { ReportsPage } from './pages/reports/ReportsPage';
+import { CommodityCategoryPage } from './pages/masters/CommodityCategoryPage';
+import { CommoditySubCategoryPage } from './pages/masters/CommoditySubCategoryPage';
+import { CommoditySubItemPage } from './pages/masters/CommoditySubItemPage';
+import { InterestDeclarationPage } from './pages/masters/InterestDeclarationPage';
+import { EmployeeManagementPage } from './pages/masters/EmployeeManagementPage';
+import { MastersIndexRedirect, MastersLayout } from './pages/masters/MastersLayout';
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route
+          element={
+            <BranchProvider>
+              <LoanPrintPage />
+            </BranchProvider>
+          }
+          path="loans/:id/print"
+        />
+        <Route
+          element={
+            <BranchProvider>
+              <ModuleSettingsProvider>
+                <Layout />
+              </ModuleSettingsProvider>
+            </BranchProvider>
+          }
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="customers" element={<CustomerListPage />} />
+          <Route path="customers/new" element={<CustomerCreatePage />} />
+          <Route path="customers/:id/edit" element={<CustomerEditPage />} />
+          <Route path="customers/:id" element={<CustomerDetailPage />} />
+          <Route path="loans" element={<LoanListPage />} />
+          <Route path="loans/new" element={<LoanCreatePage />} />
+          <Route path="loans/:id/edit" element={<LoanEditPage />} />
+          <Route
+            path="loans/:id/bank-loan"
+            element={
+              <OptionalModuleRoute module="bankLoans">
+                <LoanBankLoanPage />
+              </OptionalModuleRoute>
+            }
+          />
+          <Route path="loans/:id/close" element={<LoanClosePage />} />
+          <Route path="loans/:id" element={<LoanDetailPage />} />
+          <Route path="interest" element={<Navigate to="/part-payments" replace />} />
+          <Route path="part-payments" element={<PartPaymentLayout />}>
+            <Route index element={<PartPaymentListPage />} />
+            <Route path="record" element={<PartPaymentRecordPage />} />
+          </Route>
+          <Route
+            path="bank-loans"
+            element={
+              <OptionalModuleRoute module="bankLoans">
+                <BankLoanLayout />
+              </OptionalModuleRoute>
+            }
+          >
+            <Route index element={<BankLoanListPage />} />
+            <Route path="record" element={<BankLoanRecordPage />} />
+            <Route path="batch" element={<BankLoanBatchPage />} />
+          </Route>
+          <Route path="renewals" element={<RenewalLayout />}>
+            <Route index element={<RenewalListPage />} />
+            <Route path="record" element={<RenewalRecordPage />} />
+          </Route>
+          <Route
+            path="repledges"
+            element={
+              <OptionalModuleRoute module="bankLoans">
+                <Navigate to="/bank-loans" replace />
+              </OptionalModuleRoute>
+            }
+          />
+          <Route
+            path="auctions"
+            element={
+              <OptionalModuleRoute module="auctions">
+                <AuctionsPage />
+              </OptionalModuleRoute>
+            }
+          />
+          <Route path="inventory" element={<InventoryPage />} />
+          <Route path="accounts" element={<AccountsPage />} />
+          <Route
+            path="investments"
+            element={
+              <OptionalModuleRoute module="investments">
+                <InvestmentsPage />
+              </OptionalModuleRoute>
+            }
+          />
+          <Route
+            path="gl"
+            element={
+              <OptionalModuleRoute module="gl">
+                <GlPage />
+              </OptionalModuleRoute>
+            }
+          />
+          <Route
+            path="notifications"
+            element={
+              <OptionalModuleRoute module="notifications">
+                <NotificationsPage />
+              </OptionalModuleRoute>
+            }
+          />
+          <Route path="pay-advances" element={<PayAdvancesPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="branches" element={<Navigate to="/settings/branches" replace />} />
+          <Route path="settings" element={<SettingsLayout />}>
+            <Route index element={<SettingsIndexRedirect />} />
+            <Route path="organization" element={<OrganizationSettingsPage />} />
+            <Route path="branches" element={<SettingsBranchesPage />} />
+            <Route path="preferences" element={<ApplicationSettingsPage />} />
+            <Route path="security" element={<SecurityLayout />}>
+              <Route index element={<SecurityIndexRedirect />} />
+              <Route path="users" element={<UsersSettingsPage />} />
+              <Route path="roles" element={<RolePermissionsPage />} />
+              <Route path="audit" element={<AuditLogPage />} />
+            </Route>
+          </Route>
+          <Route path="masters" element={<MastersLayout />}>
+            <Route index element={<MastersIndexRedirect />} />
+            <Route path="categories" element={<CommodityCategoryPage />} />
+            <Route path="sub-categories" element={<CommoditySubCategoryPage />} />
+            <Route path="sub-items" element={<CommoditySubItemPage />} />
+            <Route path="interest-declarations" element={<InterestDeclarationPage />} />
+            <Route path="employees" element={<EmployeeManagementPage />} />
+          </Route>
+        </Route>
+      </Route>
+    </Routes>
+  );
+}

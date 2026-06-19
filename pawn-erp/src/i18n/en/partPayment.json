@@ -1,0 +1,55 @@
+{
+  "title": "Part Payment",
+  "subtitle": "View part payment register and record new payments",
+  "nav": {
+    "list": "Payment list",
+    "record": "Record payment"
+  },
+  "list": {
+    "title": "Part payment register",
+    "empty": "No part payments recorded yet.",
+    "record_new": "Record payment",
+    "from_date": "From date",
+    "to_date": "To date",
+    "search": "Search name, phone or customer ID",
+    "edit_title": "Edit part payment",
+    "delete_message": "Delete this part payment record?"
+  },
+  "record": {
+    "title": "Record part payment",
+    "subtitle": "Fetch an open loan and record a partial payment",
+    "receipt_no": "Receipt No.",
+    "loan_id": "Loan ID",
+    "fetch": "Fetch loan",
+    "fetching": "Fetching…",
+    "not_found": "No open loan found for this receipt.",
+    "closed_loan": "This loan is closed. Part payments can only be recorded on open loans.",
+    "bank_deposit": "This loan has an open bank deposit. Resolve it before recording part payment."
+  },
+  "columns": {
+    "receipt": "Receipt",
+    "customer": "Customer",
+    "loan_amount": "Loan amount",
+    "amount": "Paid amount",
+    "pay_date": "Paid date",
+    "actions": "Actions"
+  },
+  "detail": {
+    "loan": "Loan details",
+    "customer": "Customer",
+    "items": "Collateral items",
+    "interest": "Interest (as of today)",
+    "amount_paid": "Amount paid",
+    "amount_to_pay": "Amount to be paid",
+    "existing_payments": "Existing part payments",
+    "add_payment": "Add part payment"
+  },
+  "fields": {
+    "amount": "Amount",
+    "pay_date": "Payment date"
+  },
+  "actions": {
+    "save": "Save payment",
+    "view_loan": "View loan"
+  }
+}

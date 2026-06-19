@@ -1,0 +1,57 @@
+{
+  "title": "Renewal & Defaults",
+  "subtitle": "Overdue loans, defaults, and easy renewal",
+  "nav": {
+    "list": "Defaults list",
+    "record": "Renew loan"
+  },
+  "list": {
+    "title": "Overdue & defaulted loans",
+    "empty": "No overdue or defaulted loans.",
+    "renew": "Renew",
+    "record_new": "Renew loan",
+    "overdue": "Overdue",
+    "default": "Default",
+    "open": "Open"
+  },
+  "record": {
+    "title": "Easy renewal",
+    "subtitle": "Look up an open loan, review settlement, and create the renewed loan",
+    "receipt_no": "Receipt No.",
+    "fetch": "Fetch loan",
+    "fetching": "Fetching…",
+    "not_found": "No open loan found for this receipt.",
+    "closed_loan": "This loan is already closed or renewed.",
+    "bank_deposit": "This loan has an open bank deposit. Settle it before renewal.",
+    "cannot_renew": "This loan cannot be renewed.",
+    "overdue_hint": "Renewal date has passed",
+    "settlement": "Settlement (current loan)",
+    "new_loan": "New loan",
+    "outstanding": "Outstanding principal",
+    "interest": "Interest",
+    "total_payable": "Principal + interest",
+    "part_paid": "Part payments",
+    "amount_due": "Amount due on renewal",
+    "discount": "Interest discount",
+    "due_after_discount": "Due after discount",
+    "new_receipt": "New receipt no.",
+    "new_amount": "New loan amount",
+    "renewal_date": "Renewal date",
+    "top_up": "Additional loan (top-up)",
+    "cash_from_customer": "Cash from customer",
+    "cash_to_customer": "Cash to customer",
+    "security_pin": "Security PIN",
+    "submit": "Renew & close previous",
+    "submitting": "Renewing…",
+    "success_title": "Loan renewed",
+    "success_body": "Receipt #{{oldReceipt}} closed. New receipt #{{newReceipt}} created.",
+    "view_new": "View new loan",
+    "print_new": "Print agreement",
+    "renew_another": "Renew another",
+    "errors": {
+      "required": "New receipt, amount, date, and security PIN are required",
+      "duplicate_invoice": "Receipt number already exists",
+      "invalid_amount": "Enter a valid loan amount"
+    }
+  }
+}

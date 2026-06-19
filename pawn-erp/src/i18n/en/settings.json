@@ -1,0 +1,95 @@
+{
+  "title": "Settings",
+  "subtitle": "Organization, branches, application preferences, and security",
+  "nav": {
+    "organization": "Organization",
+    "branches": "Branches",
+    "preferences": "Application",
+    "security": "User Management & Security"
+  },
+  "organization": {
+    "title": "Organization profile",
+    "hint": "Company name and proprietor appear on all branch receipts and printouts.",
+    "company_name": "Company / shop name",
+    "proprietor": "Proprietor",
+    "dashboard_refresh_seconds": "Dashboard auto-refresh (seconds)",
+    "dashboard_refresh_hint": "Minimum {{min}} seconds. Applies to all users on the dashboard.",
+    "dashboard_refresh_min": "Dashboard refresh must be at least {{min}} seconds.",
+    "saved": "Organization profile saved.",
+    "modules": {
+      "title": "Optional modules",
+      "hint": "Enable only the modules your shop uses. Disabled modules are hidden from the menu and blocked from direct URLs.",
+      "bank_loans": "Bank loans",
+      "bankLoans_hint": "Bank re-pledge, batches, and loan bank deposit workflows.",
+      "auctions": "Auctions",
+      "auctions_hint": "Auction notices, legal clearance, sales, and settlements.",
+      "investments": "Investments",
+      "investments_hint": "Capital investments, ledger, and profit sharing.",
+      "gl": "General ledger",
+      "gl_hint": "Chart of accounts, journal entries, and trial balance.",
+      "notifications": "Notifications",
+      "notifications_hint": "SMS / reminder processing and notification queue."
+    }
+  },
+  "preferences": {
+    "title": "Application preferences",
+    "hint": "Dashboard refresh, session timeout, and optional module visibility.",
+    "saved": "Application preferences saved.",
+    "session_timeout_minutes": "Session timeout (minutes)",
+    "session_timeout_hint": "Users are logged out after this period of inactivity. JWT tokens use the same duration.",
+    "session_timeout_range": "Session timeout must be between {{min}} and {{max}} minutes."
+  },
+  "security": {
+    "nav": {
+      "users": "Users",
+      "roles": "Role permissions",
+      "audit": "Audit trail"
+    },
+    "users": {
+      "hint": "Create login accounts and assign roles. JWT authentication with role-based access control.",
+      "add_title": "Add user",
+      "edit_title": "Edit user",
+      "list_title": "System users",
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "password_optional": "Leave blank to keep current",
+      "password_required": "Password is required for new users.",
+      "role": "Role",
+      "branch": "Branch",
+      "no_branch": "All branches (super admin)",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "roles": {
+      "hint": "Six roles with fixed permissions. Super Admin has full access.",
+      "permission": "Permission",
+      "SUPER_ADMIN": "Super Admin",
+      "BRANCH_MANAGER": "Branch Manager",
+      "CASHIER": "Cashier",
+      "APPRAISER": "Appraiser",
+      "ACCOUNTANT": "Accountant",
+      "AUDITOR": "Auditor"
+    },
+    "audit": {
+      "hint": "Every create, update, and delete action is logged automatically.",
+      "time": "Time",
+      "user": "User",
+      "action": "Action",
+      "entity": "Entity",
+      "entity_id": "Entity ID",
+      "from": "From",
+      "to": "To",
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page {{page}} of {{total}}"
+    }
+  },
+  "branches": {
+    "branch_name": "Branch label",
+    "branch_name_hint": "Short name shown in the branch selector (e.g. Main, North)."
+  }
+}

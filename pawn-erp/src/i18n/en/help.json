@@ -1,0 +1,535 @@
+{
+  "panel_title": "Help & Support",
+  "support_menu": "Support",
+  "help_button": "Help",
+  "close": "Close",
+  "tab_this_page": "This page",
+  "tab_all_topics": "All topics",
+  "section_steps": "How to use",
+  "section_example": "Example",
+  "section_tips": "Tips",
+  "groups": {
+    "core": "Daily operations",
+    "operations": "Loan services",
+    "finance": "Finance & reports",
+    "admin": "Settings & security",
+    "masters": "Master data"
+  },
+  "pages": {
+    "dashboard": {
+      "title": "Dashboard",
+      "purpose": "Your daily command centre — open loans, renewals due, cash position, and shortcuts to common tasks.",
+      "steps": [
+        "Confirm the correct branch is selected in the top toolbar.",
+        "Review KPI cards: open loans, disbursed amount, renewals due, and overdue count.",
+        "Use Quick Actions to start a new loan, record renewal, part payment, or bank batch.",
+        "Click any metric card to jump to the related list."
+      ],
+      "example_title": "Morning shop review",
+      "example": "At opening, check Renewals Due and Overdue counts. If 15 loans are due today, open Renewals from Quick Actions and process them before new pawns.",
+      "tips": [
+        "Figures are branch-specific — switch branch before comparing totals.",
+        "Charts may take a moment to load with large historical data."
+      ]
+    },
+    "customers-list": {
+      "title": "Customers",
+      "purpose": "Search and open customer records before creating or servicing loans.",
+      "steps": [
+        "Type a customer name or mobile number in the search box.",
+        "Click a row to open the customer profile and loan history.",
+        "Click New Customer to register someone who has never pawned before."
+      ],
+      "example_title": "Find an existing customer",
+      "example": "A customer says their ID is 1000 — search \"அமுதா\" or scroll the list, open the profile, then click New Loan from their loan history.",
+      "tips": [
+        "Customer ID (business number) is shown on receipts and must be unique.",
+        "Deleted customers are hidden from the default list."
+      ]
+    },
+    "customers-new": {
+      "title": "New Customer",
+      "purpose": "Register a customer before their first pawn loan.",
+      "steps": [
+        "Accept the suggested Customer ID or enter the next available number.",
+        "Fill name, father/husband name, full address, city, state, PIN, and mobile.",
+        "Click Save — you will land on the profile to add KYC documents if needed."
+      ],
+      "example_title": "First-time pawner",
+      "example": "New customer Lakshmi, mobile 9876543210, address Nadar New Street Usilampatti — save as ID 5821, then go to Loans → New Pawn Loan.",
+      "tips": [
+        "Double-check mobile number — used for SMS reminders when notifications are enabled.",
+        "Photo can be added later from the customer detail page."
+      ]
+    },
+    "customers-detail": {
+      "title": "Customer Profile",
+      "purpose": "View contact details, KYC documents, and complete loan history for one customer.",
+      "steps": [
+        "Review Profile for address and contact numbers.",
+        "Open KYC & IDs to verify or upload identity documents.",
+        "Use the Loans table to open any receipt or start a new pawn."
+      ],
+      "example_title": "Customer with multiple loans",
+      "example": "Customer #1000 has closed receipt #1014788 (2018) and may have newer open loans — use the Loans section to see all receipts without searching the main loan list.",
+      "tips": [
+        "Click Edit to update address or mobile after a customer moves.",
+        "Loan links open the full pawn detail including collateral lines."
+      ]
+    },
+    "customers-edit": {
+      "title": "Edit Customer",
+      "purpose": "Update customer contact or address information.",
+      "steps": [
+        "Change only the fields that need correction.",
+        "Save — changes apply to future receipts; past printed receipts are unchanged."
+      ],
+      "example_title": "Mobile number change",
+      "example": "Customer changed from 8056371451 to 9123456780 — update mobile here so renewal SMS reaches the right number.",
+      "tips": ["Customer ID cannot be changed after creation — create a new profile only if truly a different person."]
+    },
+    "loans-list": {
+      "title": "Pawn Loans",
+      "purpose": "Search all pawn receipts by number, customer name, or status.",
+      "steps": [
+        "Search by receipt number (e.g. 92288) or customer name.",
+        "Filter by open, closed, gold, or silver as needed.",
+        "Click a row for full loan detail, or New Pawn Loan for a fresh pledge."
+      ],
+      "example_title": "Locate an open loan",
+      "example": "Customer brings receipt #92288 — search 92288, confirm name and amount match, then process renewal or part payment from the detail page.",
+      "tips": [
+        "Receipt numbers are unique per branch.",
+        "Closed loans remain searchable for audit and reprints."
+      ]
+    },
+    "loans-new": {
+      "title": "New Pawn Loan",
+      "purpose": "Create a pawn against pledged gold or silver items and print a receipt.",
+      "steps": [
+        "Search and select the customer.",
+        "Enter a new receipt (invoice) number — must not already exist in this branch.",
+        "Choose commodity (Gold/Silver), loan condition, and customer type.",
+        "Add collateral: sub-category, item type, purity, count, and net weight per line.",
+        "Enter loan amount — amount in words fills automatically.",
+        "Confirm interest rate and renewal date, then save and print."
+      ],
+      "example_title": "Gold chain pawn",
+      "example": "Customer #4242 pledges one gold chain (செயின்), 8.500 g, KDM 916, loan ₹23,000, receipt #92289, renewal 12 months from today.",
+      "tips": [
+        "Interest % comes from Masters → Interest declarations for the amount slab.",
+        "Add multiple collateral lines for items pledged together on one receipt."
+      ]
+    },
+    "loans-detail": {
+      "title": "Loan Detail",
+      "purpose": "Full view of one pawn: customer, collateral, payments, renewal chain, and bank status.",
+      "steps": [
+        "Verify receipt number, loan amount, and renewal date with the customer.",
+        "Review collateral lines and weights against physical items.",
+        "Use actions: Edit (open loans), Close, Print, Part payment, Renewal, or Bank deposit."
+      ],
+      "example_title": "Closed historical loan",
+      "example": "Receipt #1014788 — ₹25,000 gold loan from Oct 2018, settled Oct 2019 — use this page for audit or receipt reprint only; Edit is not available on closed loans.",
+      "tips": [
+        "Part-payment history appears on this page.",
+        "Bank deposit badge shows if the loan is pledged with a bank."
+      ]
+    },
+    "loans-edit": {
+      "title": "Edit Loan",
+      "purpose": "Correct collateral or header fields on an open (unsettled) loan only.",
+      "steps": [
+        "Open the loan from the list — it must be status Open.",
+        "Adjust weights, items, or summary text as needed.",
+        "Save — do not change receipt number unless your shop policy allows."
+      ],
+      "example_title": "Weight correction",
+      "example": "Chain weighed 8.50 g but scale read 8.05 g — open Edit, fix net weight on the line, save before printing a corrected receipt copy.",
+      "tips": [
+        "Settled loans cannot be edited — contact a supervisor for historical corrections.",
+        "Changing loan amount may require manager approval per shop policy."
+      ]
+    },
+    "loans-close": {
+      "title": "Close Loan",
+      "purpose": "Settle a loan when the customer redeems pledged items and pays principal plus interest.",
+      "steps": [
+        "Confirm customer identity and receipt number.",
+        "Enter settlement amount and date.",
+        "Choose bill settlement options if applicable.",
+        "Enter security PIN when prompted, then confirm close."
+      ],
+      "example_title": "Full redemption",
+      "example": "Open loan #92288, principal ₹11,000 plus interest ₹1,320 — customer pays ₹12,320, you close with bill, release chain from vault.",
+      "tips": [
+        "Verify items against collateral lines before handing over jewellery.",
+        "Closed loans stay in the system for reports and audit."
+      ]
+    },
+    "loans-print": {
+      "title": "Print Receipt",
+      "purpose": "Print-friendly pawn receipt for the customer or shop copy.",
+      "steps": [
+        "Open from loan detail → Print, or use the print route directly.",
+        "Use browser Print (Ctrl+P) — layout hides sidebar and menus.",
+        "Check branch name and address appear correctly before handing to customer."
+      ],
+      "example_title": "Customer copy at pledge",
+      "example": "After saving new loan #92289, print two copies — one for customer, one for shop file — with receipt number, weights, and renewal date clearly visible.",
+      "tips": [
+        "Update branch address under Settings → Branches if receipts show old details.",
+        "Tamil item names come from Master Data sub-items."
+      ]
+    },
+    "part-payments-list": {
+      "title": "Part Payment",
+      "purpose": "View loans with interest payments and navigate to record new part payments.",
+      "steps": [
+        "Search by receipt or customer.",
+        "Open a loan to see payment history.",
+        "Go to Record to accept a new partial interest payment."
+      ],
+      "example_title": "Customer pays interest only",
+      "example": "Customer on receipt #92288 pays ₹500 interest without renewing — find the loan here, then Record part payment for ₹500 today.",
+      "tips": [
+        "Part payment does not extend renewal date unless you also renew.",
+        "Legacy data includes 1,709 part-payment records."
+      ]
+    },
+    "part-payments-record": {
+      "title": "Record Part Payment",
+      "purpose": "Accept partial interest payment without closing or renewing the loan.",
+      "steps": [
+        "Find the loan by receipt number.",
+        "Enter amount received and payment date.",
+        "Save — payment appears on loan detail and reports."
+      ],
+      "example_title": "Monthly interest collection",
+      "example": "Receipt #92287, customer pays ₹400 toward interest on 15th of the month — record amount ₹400, date today, print acknowledgement if required.",
+      "tips": [
+        "Amount cannot exceed outstanding interest calculated by the system.",
+        "Use Renewals if the customer wants a new term and receipt number."
+      ]
+    },
+    "renewals-list": {
+      "title": "Renewal & Defaults",
+      "purpose": "Loans approaching or past renewal date; manage defaults before auction.",
+      "steps": [
+        "Sort or filter by due date to prioritise today's renewals.",
+        "Open Easy Renewal for customers ready to extend the loan.",
+        "Flag or track defaults that may proceed to auction notice."
+      ],
+      "example_title": "Overdue follow-up",
+      "example": "2,107 open loans are past renewal date in legacy data — filter overdue, call customers starting with highest amounts, offer renewal or part payment.",
+      "tips": [
+        "Renewal creates a linked new receipt; old receipt is marked renewed.",
+        "Security PIN is required for renewal in most roles."
+      ]
+    },
+    "renewals-record": {
+      "title": "Easy Renewal",
+      "purpose": "Renew an existing loan with a new receipt, adjusted principal, and interest settlement.",
+      "steps": [
+        "Find the current open loan by receipt number.",
+        "Enter new receipt number, new loan amount, and renewal date.",
+        "Enter interest discount or top-up if applicable.",
+        "Provide security PIN and confirm."
+      ],
+      "example_title": "Standard 12-month renewal",
+      "example": "Old receipt #92288, principal ₹11,000 — customer renews for another year at ₹11,000, new receipt #92290, interest ₹1,100 collected separately.",
+      "tips": [
+        "New receipt number must be unique in the branch.",
+        "Old loan ID is stored in the renewal chain for audit."
+      ]
+    },
+    "bank-loans-list": {
+      "title": "Bank Loan",
+      "purpose": "Track pawn loans deposited with banks for liquidity (re-pledge).",
+      "steps": [
+        "View active bank deposits and settlement status.",
+        "Use Record for a single deposit or Batch for multiple loans.",
+        "Open a row to see bank name, deposit date, and closing date."
+      ],
+      "example_title": "Review bank exposure",
+      "example": "18,363 bank deposits in legacy data — filter unsettled to see total amount currently with Tamil Nadu Mercantile Bank or other lenders.",
+      "tips": [
+        "Enable this module under Settings → Application preferences.",
+        "Closing date is set when the bank loan is repaid and items return."
+      ]
+    },
+    "bank-loans-record": {
+      "title": "Record Bank Deposit",
+      "purpose": "Register one pawn loan pledged to a bank.",
+      "steps": [
+        "Select the pawn loan by receipt number.",
+        "Enter bank name, bank receipt number, deposit amount, and dates.",
+        "Save — loan detail shows bank deposit status."
+      ],
+      "example_title": "Single loan to bank",
+      "example": "Receipt #92286 deposited with TMB, bank receipt BR-4521, ₹24,200, deposit date today — record and keep pawn receipt in bank file.",
+      "tips": [
+        "Customer pawn receipt remains in your system; bank holds physical items.",
+        "Mark settled when bank loan is cleared and items return."
+      ]
+    },
+    "bank-loans-batch": {
+      "title": "Batch Bank Deposit",
+      "purpose": "Deposit multiple pawn loans to a bank in one operation.",
+      "steps": [
+        "Select bank and deposit date.",
+        "Add multiple loans from the picker or search.",
+        "Confirm total amount and save the batch."
+      ],
+      "example_title": "Month-end bank pledge",
+      "example": "Select 25 open gold loans totalling ₹4,50,000, deposit to IOB Usilampatti branch on 31 Jan — one batch instead of 25 separate entries.",
+      "tips": [
+        "Use Dashboard Quick Action Bank for faster access.",
+        "Verify each receipt is open and not already deposited."
+      ]
+    },
+    "auctions": {
+      "title": "Auction",
+      "purpose": "Manage auction notices and sale of unredeemed pledged items.",
+      "steps": [
+        "Identify defaulted loans past legal notice period.",
+        "Create auction notice with date and charges.",
+        "Record sale amount, surplus refund, or deficit after auction."
+      ],
+      "example_title": "Auction after notice",
+      "example": "Loan overdue 18 months, legal notice sent — schedule auction 30 days out, publish list, after sale record proceeds and any surplus owed to customer.",
+      "tips": [
+        "Enable module in Application preferences.",
+        "SMS auction template available under Notifications."
+      ]
+    },
+    "inventory": {
+      "title": "Inventory",
+      "purpose": "Retail items held for sale (e.g. silver articles from auctions or purchases).",
+      "steps": [
+        "Add items with description, weight, and sale price.",
+        "Update status when sold.",
+        "Use reports for stock on hand."
+      ],
+      "example_title": "Silver article for sale",
+      "example": "After auction, unsold silver bangle weighed 45 g — add to inventory at ₹3,200, mark sold when customer buys over counter.",
+      "tips": [
+        "Distinct from live pawn collateral on open loans.",
+        "Link to accounts when recording sale cash."
+      ]
+    },
+    "accounts": {
+      "title": "Daily Book & Cash",
+      "purpose": "Record daily income, expenses, and reconcile vault vs counter cash.",
+      "steps": [
+        "Open today's book or select a date.",
+        "Add income and expense entries with category and amount.",
+        "Enter physical cash count and compare to system balance."
+      ],
+      "example_title": "End-of-day cash",
+      "example": "Counter cash ₹85,400, vault ₹12,00,000 — record shop expenses ₹2,500 (tea, courier), confirm closing balance matches physical count.",
+      "tips": [
+        "Loan disbursements and settlements also flow through loan modules.",
+        "Investigate variance before closing the day."
+      ]
+    },
+    "investments": {
+      "title": "Investments",
+      "purpose": "Track shop investments and returns (optional module).",
+      "steps": [
+        "Add investment with amount, date, and expected return.",
+        "Record maturity or partial withdrawal.",
+        "Review list for upcoming maturities."
+      ],
+      "example_title": "Fixed deposit",
+      "example": "Shop FD ₹5,00,000 at 7% for 1 year — record start date, mark matured when principal returns to vault.",
+      "tips": ["Enable under Application preferences.", "Separate from pawn loan principal."]
+    },
+    "gl": {
+      "title": "General Ledger",
+      "purpose": "Double-entry ledger for accounting (optional module).",
+      "steps": [
+        "Select date range and account heads.",
+        "Review debit/credit entries posted from loans and accounts.",
+        "Export for CA or audit if needed."
+      ],
+      "example_title": "Month-end GL review",
+      "example": "Filter March entries — verify interest income credits match part-payment and renewal collections from reports.",
+      "tips": ["Enable under Application preferences.", "Posting rules depend on configured chart of accounts."]
+    },
+    "notifications": {
+      "title": "Notifications",
+      "purpose": "SMS templates and renewal or auction notices.",
+      "steps": [
+        "Edit template text for renewal_due and auction_notice.",
+        "Use placeholders: {customer_name}, {loan_id}, {due_date}, {amount}, {branch_name}.",
+        "Send or schedule notices from loan workflows where integrated."
+      ],
+      "example_title": "Renewal SMS",
+      "example": "Template: \"Hi {customer_name}, loan {loan_id} due {due_date}. Amount ₹{amount}. Visit {branch_name}.\" — sends before renewal date for open loans.",
+      "tips": [
+        "Tamil body (bodyTa) used when customer language is Tamil.",
+        "Requires SMS gateway configuration in production."
+      ]
+    },
+    "pay-advances": {
+      "title": "Pay Advances",
+      "purpose": "Record staff salary advances and recoveries.",
+      "steps": [
+        "Select employee from master list.",
+        "Enter advance amount and date.",
+        "Record recovery against future salary."
+      ],
+      "example_title": "Staff advance",
+      "example": "Employee Kumar requests ₹5,000 advance — record today, deduct ₹1,000/month for 5 months in recovery entries.",
+      "tips": ["Employees must exist under Masters → Employees.", "Link to daily book for cash outflow."]
+    },
+    "reports": {
+      "title": "Reports",
+      "purpose": "Loan registers, cash summaries, and operational exports.",
+      "steps": [
+        "Choose report type from the list.",
+        "Set date range and branch filter.",
+        "Run report and export or print."
+      ],
+      "example_title": "Open loan register",
+      "example": "Generate Open Loans as of today for Main branch — 4,394 open loans, export to Excel for manager review.",
+      "tips": [
+        "Large date ranges may take longer with 54,000+ historical loans.",
+        "Default report opens to most-used register."
+      ]
+    },
+    "settings-organization": {
+      "title": "Organization Profile",
+      "purpose": "Shop name, proprietor, and details printed on receipts.",
+      "steps": [
+        "Update company name and proprietor line.",
+        "Save — appears on new printouts.",
+        "Coordinate with Branches for per-location address."
+      ],
+      "example_title": "Receipt header",
+      "example": "Kabilan Pawn Shop, Prop.: M. Kabilan, M.E., — shown at top of every pawn receipt printed from the system.",
+      "tips": ["Super Admin only.", "Changes do not reprint old receipts automatically."]
+    },
+    "settings-branches": {
+      "title": "Branches",
+      "purpose": "Manage branch codes, addresses, and phone numbers on receipts.",
+      "steps": [
+        "Edit Main branch address and contact numbers.",
+        "Add new branches when opening additional shops.",
+        "Each branch has separate receipt number sequences."
+      ],
+      "example_title": "Main branch contact",
+      "example": "Main — Nadar New Street Usilampatti, landline 04552-250369, mobile 94867-12212 — appears on printed receipts and SMS.",
+      "tips": ["Use branch selector in toolbar when working multi-branch.", "Inactive branches hidden from selectors."]
+    },
+    "settings-preferences": {
+      "title": "Application Preferences",
+      "purpose": "Enable optional modules, session timeout, and application defaults.",
+      "steps": [
+        "Toggle Bank Loans, Auctions, Investments, GL, Notifications.",
+        "Set session idle timeout (default 30 minutes).",
+        "Save — sidebar updates immediately."
+      ],
+      "example_title": "Enable bank module",
+      "example": "Turn on Bank Loans — Bank Loan menu appears in sidebar, batch deposit and re-pledge screens become available.",
+      "tips": ["Disabled modules are hidden from all users.", "Super Admin only."]
+    },
+    "settings-users": {
+      "title": "System Users",
+      "purpose": "Create login accounts for shop staff.",
+      "steps": [
+        "Click Add user with email, name, and role.",
+        "Set initial password securely.",
+        "User signs in with email and password; can switch UI language."
+      ],
+      "example_title": "New cashier account",
+      "example": "cashier@pawn.local, role Cashier — can create loans and part payments but cannot change roles or organization settings.",
+      "tips": ["Use strong passwords in production.", "Deactivate users who leave instead of sharing admin login."]
+    },
+    "settings-roles": {
+      "title": "Roles & Permissions",
+      "purpose": "Control which modules each role can view, create, edit, or delete.",
+      "steps": [
+        "Select a role from the matrix.",
+        "Check permissions per module row.",
+        "Save — applies on next login for users with that role."
+      ],
+      "example_title": "Restrict auction access",
+      "example": "Cashier role: Loans ✓, Renewals ✓, Auctions ✗ — only Manager and Super Admin can open Auction screen.",
+      "tips": ["Super Admin bypasses all checks.", "Review after adding new modules."]
+    },
+    "settings-audit": {
+      "title": "Audit Log",
+      "purpose": "Timestamped record of sensitive actions for compliance.",
+      "steps": [
+        "Filter by date or user.",
+        "Review create/update/delete on loans, settings, and security.",
+        "Export for audit if required."
+      ],
+      "example_title": "Investigate receipt change",
+      "example": "Filter loan edits for receipt #92288 — see who changed weight and when, useful for internal dispute resolution.",
+      "tips": ["Read-only — entries cannot be deleted.", "Super Admin and managers typically have access."]
+    },
+    "masters-categories": {
+      "title": "Commodity Categories",
+      "purpose": "Top-level pledge types: Gold, Silver, and other commodity classes.",
+      "steps": [
+        "View existing categories (5 imported from legacy).",
+        "Add English and Tamil names for new categories.",
+        "Deactivate instead of delete if used on old loans."
+      ],
+      "example_title": "Gold vs Silver",
+      "example": "All gold pawns use category Gold (தங்கம்) — interest slabs and tax declarations are configured per category.",
+      "tips": ["Changes affect new loans only.", "Sub-categories are configured on the next screen."]
+    },
+    "masters-sub-categories": {
+      "title": "Sub Categories",
+      "purpose": "Groupings under each commodity — Ring, Chain, Thali, etc.",
+      "steps": [
+        "Select commodity category first.",
+        "Add sub-category with English and Tamil names.",
+        "Used when adding collateral lines on new loans."
+      ],
+      "example_title": "Chain under gold",
+      "example": "செயின் (Chain) under Gold — when pawning a chain, staff pick Gold → Chain → specific item name on loan form.",
+      "tips": ["25 sub-categories imported from legacy.", "Inactive sub-categories hidden from loan form pickers."]
+    },
+    "masters-sub-items": {
+      "title": "Sub Items",
+      "purpose": "Specific item names printed on receipts (Tamil/English).",
+      "steps": [
+        "Select category and sub-category.",
+        "Add item name — often Tamil as used on legacy receipts.",
+        "Pick from cascading dropdown on loan form."
+      ],
+      "example_title": "Receipt line item",
+      "example": "லேடீஸ்மோதிரம் under Gold → Ring — appears as collateral description on printed receipt.",
+      "tips": ["185 items imported from legacy pawnshop26.", "Duplicate names under same sub-category are prevented."]
+    },
+    "masters-interest": {
+      "title": "Interest Declarations",
+      "purpose": "Interest percentage slabs by commodity and loan amount range.",
+      "steps": [
+        "Select commodity (Gold/Silver).",
+        "Add row: min amount, max amount, general customer %, other shop %.",
+        "Loan form auto-picks rate based on amount and customer type."
+      ],
+      "example_title": "Gold slab",
+      "example": "Gold ₹10,000–₹50,000 at 2.00% per month for general customers — a ₹23,000 loan gets 2.00% automatically.",
+      "tips": ["Other shop rate applies when loan customer type is Other shop.", "Overlapping slabs should be avoided."]
+    },
+    "masters-employees": {
+      "title": "Employees",
+      "purpose": "Staff master for pay advances and internal reference.",
+      "steps": [
+        "Add employee name, role, and contact.",
+        "Use in Pay Advances module.",
+        "Deactivate when staff leave."
+      ],
+      "example_title": "Link to advances",
+      "example": "Add employee \"Ramesh - Counter\" — when recording ₹3,000 advance, select Ramesh from dropdown.",
+      "tips": ["Separate from system login users.", "Optional for shops that track advances by name only."]
+    }
+  }
+}
