@@ -2,13 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { customersApi, type CustomerActivity } from '../../api/customers';
 import { Card, CardTitle } from '../ui/Card';
+import { formatDateTimeIN } from '../../lib/formatDate';
 
-function formatWhen(iso: string) {
-  return new Date(iso).toLocaleString(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-}
+const formatWhen = formatDateTimeIN;
 
 export function CustomerActivityTimeline({ customerId }: { customerId: number }) {
   const { t } = useTranslation('customer');

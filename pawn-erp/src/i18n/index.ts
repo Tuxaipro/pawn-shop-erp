@@ -11,6 +11,9 @@ import enBankLoan from './en/bankLoan.json';
 import enRenewal from './en/renewal.json';
 import enInventory from './en/inventory.json';
 import enHelp from './en/help.json';
+import enAccounts from './en/accounts.json';
+import enReports from './en/reports.json';
+import enGl from './en/gl.json';
 import ta from './ta/common.json';
 import taCustomer from './ta/customer.json';
 import taLoan from './ta/loan.json';
@@ -21,6 +24,9 @@ import taBankLoan from './ta/bankLoan.json';
 import taRenewal from './ta/renewal.json';
 import taInventory from './ta/inventory.json';
 import taHelp from './ta/help.json';
+import taAccounts from './ta/accounts.json';
+import taReports from './ta/reports.json';
+import taGl from './ta/gl.json';
 
 i18n
   .use(LanguageDetector)
@@ -38,6 +44,9 @@ i18n
         renewal: enRenewal,
         inventory: enInventory,
         help: enHelp,
+        accounts: enAccounts,
+        reports: enReports,
+        gl: enGl,
       },
       ta: {
         common: ta,
@@ -50,9 +59,12 @@ i18n
         renewal: taRenewal,
         inventory: taInventory,
         help: taHelp,
+        accounts: taAccounts,
+        reports: taReports,
+        gl: taGl,
       },
     },
-    ns: ['common', 'customer', 'loan', 'masters', 'settings', 'partPayment', 'bankLoan', 'renewal', 'inventory', 'help'],
+    ns: ['common', 'customer', 'loan', 'masters', 'settings', 'partPayment', 'bankLoan', 'renewal', 'inventory', 'help', 'accounts', 'reports', 'gl'],
     defaultNS: 'common',
     fallbackLng: 'en',
     supportedLngs: ['en', 'ta'],

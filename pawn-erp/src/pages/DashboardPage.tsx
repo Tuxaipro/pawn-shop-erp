@@ -235,12 +235,32 @@ export function DashboardPage() {
             <MetricCard
               label={t('dashboard.cash_in_hand')}
               value={formatMoney(e.financial.cashInHand)}
-              sub={e.financial.cashChange >= 0 ? `▲ ${formatMoney(e.financial.cashChange)}` : `▼ ${formatMoney(Math.abs(e.financial.cashChange))}`}
+              sub={
+                e.financial.cashOverLimit
+                  ? `Over limit by ${formatMoney(e.financial.excessCash)}`
+                  : e.financial.cashChange >= 0
+                    ? `▲ ${formatMoney(e.financial.cashChange)}`
+                    : `▼ ${formatMoney(Math.abs(e.financial.cashChange))}`
+              }
               href="/accounts"
-              accent="bg-emerald-50/50 ring-1 ring-emerald-100"
+              accent={
+                e.financial.cashOverLimit
+                  ? 'bg-amber-50/80 ring-1 ring-amber-200'
+                  : 'bg-emerald-50/50 ring-1 ring-emerald-100'
+              }
             />
             <MetricCard
-              label={t('dashboard.bank_balance')}
+              label={t('dashboard.cash_limit')}
+              value={formatMoney(e.financial.cashLimit)}
+              sub={
+                e.financial.cashOverLimit
+                  ? t('dashboard.deposit_to_bank')
+                  : t('dashboard.within_limit')
+              }
+              href="/accounts"
+            />
+            <MetricCard
+              label={t('dashboard.bank_repledge_balance')}
               value={formatMoney(e.financial.bankBalance, true)}
               href={isModuleEnabled('bankLoans') ? '/bank-loans' : undefined}
               accent="bg-orange-50/50 ring-1 ring-orange-100"

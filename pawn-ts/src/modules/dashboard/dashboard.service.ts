@@ -353,6 +353,9 @@ async function branchEnterpriseMetrics(branchId: number, refDate = new Date()) {
   const monthInterest = dec(interestMonthAgg._sum.amount ?? 0);
 
   const cashPosition = await accountsService.getDailyBalance(todayStr, branchId);
+  const cashLimit = cashPosition.cashLimit;
+  const cashOverLimit = cashPosition.cashOverLimit;
+  const excessCash = cashPosition.excessCash;
 
   const bankPledgedWeight =
     dec(bankPledgedAgg._sum.netWeightGold ?? 0) + dec(bankPledgedAgg._sum.netWeightSilver ?? 0);
@@ -439,6 +442,11 @@ async function branchEnterpriseMetrics(branchId: number, refDate = new Date()) {
     const risk = dec(openLoansAgg._sum.loanAmount ?? 0) * 0.03;
     insights.push(`Auction risk approx ${Math.round(risk).toLocaleString('en-IN')}.`);
   }
+  if (cashOverLimit) {
+    insights.push(
+      `Cash in hand exceeds limit by ₹${Math.round(excessCash).toLocaleString('en-IN')} — deposit to bank.`
+    );
+  }
   const loanTarget = Math.max(loansMonthCount, 10);
   const interestTarget = Math.max(monthInterest, 10000);
   const profitTarget = Math.max(monthIncome - monthExpense, 10000);
@@ -463,6 +471,14 @@ async function branchEnterpriseMetrics(branchId: number, refDate = new Date()) {
       : []),
     ...(overdueCount > 0
       ? [{ level: 'info' as const, message: 'Overdue loans', count: overdueCount, href: '/renewals' }]
+      : []),
+    ...(cashOverLimit
+      ? [{
+          level: 'warning' as const,
+          message: 'Cash over limit — deposit to bank',
+          count: 1,
+          href: '/accounts',
+        }]
       : []),
   ];
 
@@ -549,6 +565,9 @@ async function branchEnterpriseMetrics(branchId: number, refDate = new Date()) {
       financial: {
         cashInHand: cashPosition.cashInHand,
         cashChange: cashPosition.cashInHand - cashPosition.openingBalance,
+        cashLimit,
+        cashOverLimit,
+        excessCash,
         bankBalance: dec(bankDepositsOpen._sum.depositAmount ?? 0),
         outstandingLoans: dec(openLoansAgg._sum.loanAmount ?? 0),
         investments: dec(investmentSummary._sum.amount ?? 0),

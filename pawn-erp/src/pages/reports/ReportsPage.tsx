@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { reportsApi } from '../../api/modules';
 import { useBranch } from '../../context/BranchContext';
 import { useModuleSettings } from '../../context/ModuleSettingsContext';
@@ -7,6 +8,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Card, CardTitle } from '../../components/ui/Card';
 import { Field, Input } from '../../components/ui/Input';
+import { formatDateIN, formatDateTimeIN } from '../../lib/formatDate';
 import { DataTable, TableCard, TBody, TD, TH, THead } from '../../components/ui/Table';
 
 type ReportKey =
@@ -23,26 +25,49 @@ type ReportKey =
   | 'monthly-profit'
   | 'customer-growth';
 
-const REPORTS: { key: ReportKey; label: string; category: string; module?: 'bankLoans' | 'auctions' | 'investments' }[] = [
-  { key: 'daily-book', label: 'Daily book', category: 'Daily' },
-  { key: 'collections', label: 'Collections', category: 'Daily' },
-  { key: 'loan-register', label: 'Loan register', category: 'Daily' },
-  { key: 'renewals', label: 'Renewals', category: 'Daily' },
-  { key: 'interest', label: 'Interest collections', category: 'Daily' },
-  { key: 'auctions', label: 'Auctions', category: 'Daily', module: 'auctions' },
-  { key: 'overdue', label: 'Overdue loans', category: 'Monthly' },
-  { key: 'monthly-profit', label: 'Monthly profit', category: 'Monthly' },
-  { key: 'investment-ledger', label: 'Investment ledger', category: 'Monthly', module: 'investments' },
-  { key: 'customer-growth', label: 'Customer growth', category: 'Monthly' },
-  { key: 'bank-deposits', label: 'Bank deposits', category: 'Monthly', module: 'bankLoans' },
-  { key: 'pay-advance', label: 'Pay advances', category: 'Monthly' },
+const REPORTS: {
+  key: ReportKey;
+  labelKey: string;
+  categoryKey: 'daily' | 'monthly';
+  module?: 'bankLoans' | 'auctions' | 'investments';
+}[] = [
+  { key: 'daily-book', labelKey: 'types.daily_book', categoryKey: 'daily' },
+  { key: 'collections', labelKey: 'types.collections', categoryKey: 'daily' },
+  { key: 'loan-register', labelKey: 'types.loan_register', categoryKey: 'daily' },
+  { key: 'renewals', labelKey: 'types.renewals', categoryKey: 'daily' },
+  { key: 'interest', labelKey: 'types.interest', categoryKey: 'daily' },
+  { key: 'auctions', labelKey: 'types.auctions', categoryKey: 'daily', module: 'auctions' },
+  { key: 'overdue', labelKey: 'types.overdue', categoryKey: 'monthly' },
+  { key: 'monthly-profit', labelKey: 'types.monthly_profit', categoryKey: 'monthly' },
+  { key: 'investment-ledger', labelKey: 'types.investment_ledger', categoryKey: 'monthly', module: 'investments' },
+  { key: 'customer-growth', labelKey: 'types.customer_growth', categoryKey: 'monthly' },
+  { key: 'bank-deposits', labelKey: 'types.bank_deposits', categoryKey: 'monthly', module: 'bankLoans' },
+  { key: 'pay-advance', labelKey: 'types.pay_advance', categoryKey: 'monthly' },
 ];
 
 function formatMoney(value: number) {
   return `₹${value.toLocaleString('en-IN')}`;
 }
 
+const DATE_TIME_KEYS = new Set(['dateTime', 'createdOn', 'updatedOn', 'timestamp']);
+
+function formatReportCell(key: string, value: unknown): string {
+  if (value == null || value === '') return '—';
+  if (typeof value === 'number' && key.toLowerCase().includes('amount')) {
+    return formatMoney(value);
+  }
+  const str = String(value);
+  if (DATE_TIME_KEYS.has(key) || key.endsWith('At')) {
+    return formatDateTimeIN(str);
+  }
+  if (key.endsWith('Date') && /^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    return formatDateIN(str);
+  }
+  return str;
+}
+
 export function ReportsPage() {
+  const { t } = useTranslation('reports');
   const { branchId } = useBranch();
   const { isModuleEnabled } = useModuleSettings();
   const today = new Date().toISOString().slice(0, 10);
@@ -101,21 +126,21 @@ export function ReportsPage() {
   const report = data as Record<string, unknown> | undefined;
   const items = (report?.items as Array<Record<string, unknown>>) ?? (report?.ledger as Array<Record<string, unknown>>) ?? [];
 
-  const categories = [...new Set(visibleReports.map((r) => r.category))];
+  const categories = [...new Set(visibleReports.map((r) => r.categoryKey))];
 
   return (
     <div>
-      <PageHeader title="Reports" subtitle="Daily, monthly & operational reports" />
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <div className="mb-6 grid gap-6 lg:grid-cols-4">
         <Card className="lg:col-span-1">
-          <CardTitle>Report types</CardTitle>
+          <CardTitle>{t('report_types')}</CardTitle>
           <div className="mt-4 space-y-4">
             {categories.map((cat) => (
               <div key={cat}>
-                <p className="mb-2 text-xs font-medium uppercase text-zinc-500">{cat}</p>
+                <p className="mb-2 text-xs font-medium uppercase text-zinc-500">{t(`categories.${cat}`)}</p>
                 <div className="flex flex-col gap-2">
-                  {visibleReports.filter((r) => r.category === cat).map((r) => (
+                  {visibleReports.filter((r) => r.categoryKey === cat).map((r) => (
                     <Button
                       key={r.key}
                       type="button"
@@ -123,7 +148,7 @@ export function ReportsPage() {
                       className="w-full justify-start"
                       onClick={() => setActive(r.key)}
                     >
-                      {r.label}
+                      {t(r.labelKey)}
                     </Button>
                   ))}
                 </div>
@@ -201,10 +226,8 @@ export function ReportsPage() {
                             .filter((k) => !['id', 'metadata'].includes(k))
                             .slice(0, 8)
                             .map((k) => (
-                              <TD key={k}>
-                                {typeof row[k] === 'number' && k.toLowerCase().includes('amount')
-                                  ? formatMoney(row[k] as number)
-                                  : String(row[k] ?? '—')}
+                              <TD key={k} className={k === 'dateTime' ? 'whitespace-nowrap' : undefined}>
+                                {formatReportCell(k, row[k])}
                               </TD>
                             ))}
                         </tr>

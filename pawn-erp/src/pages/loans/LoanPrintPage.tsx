@@ -4,9 +4,12 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { loansApi } from '../../api/loans';
+import { LoanItemQr } from '../../components/LoanItemQr';
 import { useBranch } from '../../context/BranchContext';
+import { useModuleSettings } from '../../context/ModuleSettingsContext';
 import { formatAmountInWords } from '../../lib/amountInWords';
 import { formatLoanConditionText } from '../../lib/loanConditionText';
+import { localizedCommodity, localizedItemNames } from '../../lib/localizedItem';
 
 type LoanPrintData = NonNullable<Awaited<ReturnType<typeof loansApi.get>>>;
 
@@ -43,17 +46,20 @@ function PrintCopy({
   loan,
   copyLabel,
   t,
+  language,
   pageBreakAfter = false,
 }: {
   loan: LoanPrintData;
   copyLabel: string;
   t: TFunction<'loan'>;
+  language: string | undefined;
   pageBreakAfter?: boolean;
 }) {
   const conditionText = formatLoanConditionText(loan, t);
   const isClosed = loan.settlementStatus === 1;
   const branch = loan.branch;
   const org = loan.organization;
+  const qrEnabled = org.qrCodesEnabled ?? false;
   const contactLines = branchContactLines(branch, t);
 
   return (
@@ -96,6 +102,11 @@ function PrintCopy({
                 className="ml-auto inline-block text-right"
               />
               <p className="mt-1 text-[12px] font-bold">{copyLabel}</p>
+              {qrEnabled && loan.qrCode && (
+                <div className="mt-2 flex justify-end">
+                  <LoanItemQr value={loan.qrCode} size={72} />
+                </div>
+              )}
             </td>
           </tr>
         </tbody>
@@ -162,19 +173,24 @@ function PrintCopy({
           </tr>
         </thead>
         <tbody>
-          {loan.items.map((item, index) => (
+          {loan.items.map((item, index) => {
+            const names = localizedItemNames(item, language);
+            return (
             <tr key={item.id}>
               <td className="border border-zinc-300 px-0.5 py-0.5 text-center">{index + 1}</td>
-              <td className="border border-zinc-300 px-0.5 py-0.5">{loan.commodityTypeLabel}</td>
-              <td className="border border-zinc-300 px-0.5 py-0.5">{item.subCategoryName}</td>
-              <td className="border border-zinc-300 px-0.5 py-0.5">{item.itemName}</td>
               <td className="border border-zinc-300 px-0.5 py-0.5">
-                {loan.commodityTypeCode === 'silver' ? t('collateral.purity_na') : item.purityName}
+                {localizedCommodity(loan.commodityTypeCode, loan.commodityTypeLabel, language)}
+              </td>
+              <td className="border border-zinc-300 px-0.5 py-0.5">{names.subCategory}</td>
+              <td className="border border-zinc-300 px-0.5 py-0.5">{names.item}</td>
+              <td className="border border-zinc-300 px-0.5 py-0.5">
+                {loan.commodityTypeCode === 'silver' ? t('collateral.purity_na') : names.purity}
               </td>
               <td className="border border-zinc-300 px-0.5 py-0.5 text-center">{item.noOfItems}</td>
               <td className="border border-zinc-300 px-0.5 py-0.5 text-center">{item.netWeight}</td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
 
@@ -185,8 +201,11 @@ function PrintCopy({
 }
 
 export function LoanPrintPage() {
-  const { t } = useTranslation('loan');
+  const { t, i18n } = useTranslation('loan');
   const { branchId } = useBranch();
+  const { receiptLanguage } = useModuleSettings();
+  // Receipts always print in the configured receipt language, not the UI language.
+  const printT = i18n.getFixedT(receiptLanguage, 'loan');
   const { id } = useParams<{ id: string }>();
   const loanId = Number(id);
 
@@ -223,8 +242,19 @@ export function LoanPrintPage() {
         </button>
       </div>
 
-      <PrintCopy loan={loan} copyLabel={t('print.customer_copy')} t={t} pageBreakAfter />
-      <PrintCopy loan={loan} copyLabel={t('print.company_copy')} t={t} />
+      <PrintCopy
+        loan={loan}
+        copyLabel={printT('print.customer_copy')}
+        t={printT}
+        language={receiptLanguage}
+        pageBreakAfter
+      />
+      <PrintCopy
+        loan={loan}
+        copyLabel={printT('print.company_copy')}
+        t={printT}
+        language={receiptLanguage}
+      />
 
       <style>{`
         @media print {

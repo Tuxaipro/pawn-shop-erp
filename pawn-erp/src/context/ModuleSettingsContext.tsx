@@ -16,6 +16,10 @@ interface ModuleSettingsContextValue {
   modules: ModuleFlags;
   dashboardRefreshSeconds: number;
   sessionTimeoutMinutes: number;
+  qrCodesEnabled: boolean;
+  companyName: string;
+  logoUrl: string;
+  receiptLanguage: string;
   isLoading: boolean;
   isModuleEnabled: (key: OptionalModuleKey) => boolean;
   isPathEnabled: (path: string) => boolean;
@@ -35,11 +39,19 @@ export function ModuleSettingsProvider({ children }: { children: ReactNode }) {
     data?.dashboardRefreshSeconds
   );
   const sessionTimeoutMinutes = data?.sessionTimeoutMinutes ?? 30;
+  const qrCodesEnabled = data?.qrCodesEnabled ?? false;
+  const companyName = data?.companyName ?? '';
+  const logoUrl = data?.logoUrl ?? '';
+  const receiptLanguage = data?.receiptLanguage || 'ta';
 
   const value: ModuleSettingsContextValue = {
     modules,
     dashboardRefreshSeconds,
     sessionTimeoutMinutes,
+    qrCodesEnabled,
+    companyName,
+    logoUrl,
+    receiptLanguage,
     isLoading,
     isModuleEnabled: (key) => modules[key],
     isPathEnabled: (path) => isModulePathEnabled(path, modules),

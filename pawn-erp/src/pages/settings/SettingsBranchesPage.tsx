@@ -7,6 +7,7 @@ import { useBranch } from '../../context/BranchContext';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
+import { RowActions } from '../../components/ui/RowActions';
 import { Card } from '../../components/ui/Card';
 import { Field, Input } from '../../components/ui/Input';
 import { Section } from '../../components/ui/Section';
@@ -44,7 +45,7 @@ function branchToForm(b: BranchRecord): BranchForm {
 export function SettingsBranchesPage() {
   const { t } = useTranslation(['settings', 'common']);
   const { user } = useAuth();
-  const { refreshBranches } = useBranch();
+  const { refreshBranches, branchId, setBranchId } = useBranch();
   const queryClient = useQueryClient();
   const [form, setForm] = useState<BranchForm>(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -76,6 +77,20 @@ export function SettingsBranchesPage() {
     onSuccess: async () => {
       resetForm();
       await queryClient.invalidateQueries({ queryKey: ['branches'] });
+      await refreshBranches();
+    },
+    onError: (e: Error) => setError(e.message),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => branchesApi.delete(id),
+    onSuccess: async (_data, deletedId) => {
+      if (editingId === deletedId) resetForm();
+      await queryClient.invalidateQueries({ queryKey: ['branches'] });
+      const list = await branchesApi.list();
+      if (branchId === deletedId && list.length > 0) {
+        setBranchId(list[0].id);
+      }
       await refreshBranches();
     },
     onError: (e: Error) => setError(e.message),
@@ -198,9 +213,20 @@ export function SettingsBranchesPage() {
                       </Badge>
                     </TD>
                     <TD>
-                      <Button type="button" variant="ghost" onClick={() => { setEditingId(b.id); setForm(branchToForm(b)); }}>
-                        {t('common:actions.edit')}
-                      </Button>
+                      <RowActions
+                        onEdit={() => {
+                          setEditingId(b.id);
+                          setForm(branchToForm(b));
+                          setError('');
+                        }}
+                        onDelete={() => deleteMutation.mutate(b.id)}
+                        showDelete={b.isActive !== false}
+                        deleteTitle={t('common:branches.confirm_delete_title')}
+                        deleteMessage={t('common:branches.confirm_delete_message', {
+                          name: b.name,
+                          code: b.code,
+                        })}
+                      />
                     </TD>
                   </tr>
                 ))}

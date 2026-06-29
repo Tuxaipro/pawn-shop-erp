@@ -12,6 +12,13 @@
     "hint": "Company name and proprietor appear on all branch receipts and printouts.",
     "company_name": "Company / shop name",
     "proprietor": "Proprietor",
+    "logo": "Company logo",
+    "logo_hint": "Shown in the sidebar and on printouts. PNG, JPG, or SVG up to 1 MB.",
+    "logo_upload": "Upload logo",
+    "logo_change": "Change logo",
+    "logo_remove": "Remove",
+    "logo_too_large": "Logo image must be 1 MB or smaller.",
+    "logo_invalid": "Please choose a PNG, JPG, GIF, WebP, or SVG image.",
     "dashboard_refresh_seconds": "Dashboard auto-refresh (seconds)",
     "dashboard_refresh_hint": "Minimum {{min}} seconds. Applies to all users on the dashboard.",
     "dashboard_refresh_min": "Dashboard refresh must be at least {{min}} seconds.",
@@ -37,12 +44,18 @@
     "saved": "Application preferences saved.",
     "session_timeout_minutes": "Session timeout (minutes)",
     "session_timeout_hint": "Users are logged out after this period of inactivity. JWT tokens use the same duration.",
-    "session_timeout_range": "Session timeout must be between {{min}} and {{max}} minutes."
+    "session_timeout_range": "Session timeout must be between {{min}} and {{max}} minutes.",
+    "cash_limit": "Maximum cash in hand (₹)",
+    "cash_limit_hint": "When cash exceeds this limit at day close, the system recommends depositing the excess to the bank the next day.",
+    "receipt_language": "Receipt print language",
+    "receipt_language_hint": "Language used when printing loan receipts, regardless of the app display language.",
+    "qr_codes_enabled": "Loan item QR codes",
+    "qr_codes_enabled_hint": "One QR code per loan receipt with customer name, ID, mobile, and receipt number. Shown on loan detail, inventory, and print."
   },
   "security": {
     "nav": {
       "users": "Users",
-      "roles": "Role permissions",
+      "roles": "User Role permissions",
       "audit": "Audit trail"
     },
     "users": {
@@ -55,7 +68,7 @@
       "password": "Password",
       "password_optional": "Leave blank to keep current",
       "password_required": "Password is required for new users.",
-      "role": "Role",
+      "role": "User Role",
       "branch": "Branch",
       "no_branch": "All branches (super admin)",
       "status": "Status",
@@ -76,16 +89,51 @@
     },
     "audit": {
       "hint": "Every create, update, and delete action is logged automatically.",
-      "time": "Time",
+      "time": "Date & time",
       "user": "User",
       "action": "Action",
-      "entity": "Entity",
+      "entity": "Section",
+      "record": "Record",
+      "details": "Change details",
+      "no_details": "No changes recorded",
       "entity_id": "Entity ID",
       "from": "From",
       "to": "To",
       "prev": "Previous",
       "next": "Next",
-      "page": "Page {{page}} of {{total}}"
+      "page": "Page {{page}} of {{total}}",
+      "actions": {
+        "created": "Created",
+        "updated": "Updated",
+        "deleted": "Deleted",
+        "login": "Signed in",
+        "logout": "Signed out",
+        "activated": "Activated",
+        "deactivated": "Deactivated"
+      },
+      "entities": {
+        "auth": "Login",
+        "users": "User account",
+        "loans": "Loan",
+        "customers": "Customer",
+        "commodities": "Commodity",
+        "masters": "Master data",
+        "interest": "Interest scheme",
+        "renewals": "Renewal",
+        "repledges": "Re-pledge",
+        "auctions": "Auction",
+        "inventory": "Inventory",
+        "accounts": "Accounts",
+        "reports": "Report",
+        "investments": "Investment",
+        "pay_advances": "Pay advance",
+        "gl": "General ledger",
+        "notifications": "Notification",
+        "settings": "Settings",
+        "branches": "Branch",
+        "dashboard": "Dashboard",
+        "audit": "Audit log"
+      }
     }
   },
   "branches": {

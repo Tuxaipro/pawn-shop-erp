@@ -90,6 +90,9 @@ export interface DashboardSummary {
     financial: {
       cashInHand: number;
       cashChange: number;
+      cashLimit: number;
+      cashOverLimit: boolean;
+      excessCash: number;
       bankBalance: number;
       outstandingLoans: number;
       investments: number;
@@ -371,8 +374,10 @@ export const inventoryApi = {
   overdue: (branchId: number) => api.get(withBranch('/inventory/overdue', branchId)),
   detail: (loanId: number, branchId: number) =>
     api.get(withBranch(`/inventory/${loanId}`, branchId)),
-  barcode: (code: string, branchId: number) =>
-    api.get(withBranch(`/inventory/barcode?code=${encodeURIComponent(code)}`, branchId)),
+  qrSearch: (code: string, branchId: number) =>
+    api.get<{ found: boolean; invoiceNo?: number; message?: string }>(
+      withBranch(`/inventory/qr?code=${encodeURIComponent(code)}`, branchId)
+    ),
   updateItemMeta: (itemId: number, branchId: number, data: object) =>
     api.patch(withBranch(`/inventory/items/${itemId}/meta`, branchId), data),
 };
@@ -400,6 +405,15 @@ export const accountsApi = {
     api.post('/accounts/close-day', { ...data, branchId }),
   createTransfer: (branchId: number, data: object) =>
     api.post('/accounts/transfers', { ...data, branchId }),
+  shopDeposits: (branchId: number, fromDate?: string, toDate?: string) => {
+    const q = new URLSearchParams();
+    if (fromDate) q.set('fromDate', fromDate);
+    if (toDate) q.set('toDate', toDate);
+    const qs = q.toString();
+    return api.get(withBranch(`/accounts/shop-deposits${qs ? `?${qs}` : ''}`, branchId));
+  },
+  createShopDeposit: (branchId: number, data: object) =>
+    api.post('/accounts/shop-deposits', { ...data, branchId }),
 };
 
 export const reportsApi = {

@@ -29,4 +29,5 @@ export const branchesApi = {
   create: (data: CreateBranchInput) => api.post<BranchRecord>('/branches', data),
   update: (id: number, data: Partial<BranchProfileInput> & { isActive?: boolean }) =>
     api.put<BranchRecord>(`/branches/${id}`, data),
+  delete: (id: number) => api.delete<{ id: number; deleted: boolean }>(`/branches/${id}`),
 };

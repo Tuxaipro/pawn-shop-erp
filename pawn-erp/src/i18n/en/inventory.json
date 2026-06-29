@@ -3,9 +3,8 @@
   "subtitle": "Search collateral by receipt, customer, weight, and status",
   "search": {
     "receipt": "Receipt no.",
-    "customer": "Customer / phone / ID / barcode",
-    "barcode": "Barcode / QR scan",
-    "barcode_hint": "Name, phone, or barcode",
+    "customer": "Customer / phone / ID",
+    "customer_hint": "Name, phone, or customer ID",
     "status": "Status",
     "commodity": "Commodity",
     "min_weight": "Min weight (g)",
@@ -47,6 +46,13 @@
   "manage": "Manage",
   "empty": "No matching stock found.",
   "detail": {
-    "items": "Items"
+    "items": "Items",
+    "editing": "Editing item",
+    "weight": "Weight",
+    "locker": "Locker",
+    "location": "Location",
+    "status": "Status",
+    "notes": "Notes",
+    "save_meta": "Save"
   }
 }

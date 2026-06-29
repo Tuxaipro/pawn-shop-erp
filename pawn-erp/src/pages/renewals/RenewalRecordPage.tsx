@@ -2,19 +2,17 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
-import { loansApi, type LoanDetail } from '../../api/loans';
+import { loansApi } from '../../api/loans';
 import { renewalsApi, type RenewLoanResult } from '../../api/modules';
 import { useBranch } from '../../context/BranchContext';
 import { amountInWords } from '../../lib/amountInWords';
-import { formatDateIN } from '../../lib/formatDate';
-import { formatLoanConditionText } from '../../lib/loanConditionText';
+import { LoanRecordSummary, type SettlementRow } from '../../components/loans/LoanRecordSummary';
 import { Alert } from '../../components/ui/Alert';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Card, CardTitle } from '../../components/ui/Card';
 import { Field, Input } from '../../components/ui/Input';
 import { Section } from '../../components/ui/Section';
-import { DataTable, TableCard, TBody, TD, TH, THead } from '../../components/ui/Table';
 
 function formatMoney(value: number) {
   return `₹${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -154,9 +152,18 @@ export function RenewalRecordPage() {
     return renewal < today;
   }, [loan?.renewalDate]);
 
-  const conditionText = loan ? formatLoanConditionText(loan as LoanDetail, tLoan) : '';
-  const showGoldNet = loan?.commodityTypeCode === 'gold' && (loan?.netWeightGold ?? 0) > 0;
-  const showSilverNet = loan?.commodityTypeCode === 'silver' && (loan?.netWeightSilver ?? 0) > 0;
+  const settlementRows: SettlementRow[] = calc
+    ? [
+        { label: t('record.outstanding'), value: oldAmount },
+        { label: t('record.interest'), value: calc.interestAmount },
+        { label: t('record.total_payable'), value: calc.totalPayable, emphasize: 'semibold' },
+        { label: t('record.part_paid'), value: partPaymentTotal },
+        { label: t('record.amount_due'), value: amountDue, emphasize: 'due', borderTop: true },
+        ...(calc.totalMonths != null
+          ? [{ label: tLoan('detail.total_months'), value: calc.totalMonths, raw: true }]
+          : []),
+      ]
+    : [];
 
   function resetWizard() {
     setSuccess(null);
@@ -281,182 +288,15 @@ export function RenewalRecordPage() {
             </div>
           )}
 
-          <div className="mb-6 mt-6 flex flex-wrap items-center gap-3">
-            <h2 className="text-lg font-semibold text-zinc-950">
-              {tLoan('columns.receipt')}
-              <span className="ml-3">#{loan.invoiceNo}</span>
-            </h2>
-            <Badge variant={loan.settlementStatusLabel as 'open' | 'closed' | 'renewed'}>
-              {tLoan(`settlement.${loan.settlementStatusLabel}`)}
-            </Badge>
-            {isOverdue && <Badge variant="danger">{t('record.overdue_hint')}</Badge>}
-          </div>
-
-          <div className="mb-6 grid gap-6 lg:grid-cols-3 lg:items-start">
-            <Card className="h-full">
-              <CardTitle>{tLoan('detail.loan')}</CardTitle>
-              <dl className="mt-4 space-y-2 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('fields.loan_date')}</dt>
-                  <dd className="text-right font-medium">{formatDateIN(loan.loanDate)}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('detail.renewal')}</dt>
-                  <dd className="text-right font-medium">{formatDateIN(loan.renewalDate)}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('detail.amount')}</dt>
-                  <dd className="text-right font-semibold">{formatMoney(loan.loanAmount)}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('detail.interest')}</dt>
-                  <dd className="text-right font-medium">{loan.interest}%</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('fields.commodity')}</dt>
-                  <dd className="text-right font-medium">{loan.commodityTypeLabel}</dd>
-                </div>
-                {showGoldNet && (
-                  <div className="flex justify-between gap-4">
-                    <dt className="shrink-0 text-zinc-500">{tLoan('fields.gold_net_wt')}</dt>
-                    <dd className="text-right font-medium">{loan.netWeightGold}</dd>
-                  </div>
-                )}
-                {showSilverNet && (
-                  <div className="flex justify-between gap-4">
-                    <dt className="shrink-0 text-zinc-500">{tLoan('fields.silver_net_wt')}</dt>
-                    <dd className="text-right font-medium">{loan.netWeightSilver}</dd>
-                  </div>
-                )}
-              </dl>
-            </Card>
-
-            <Card className="h-full">
-              <CardTitle>{tLoan('detail.customer')}</CardTitle>
-              <dl className="mt-4 space-y-2 text-sm">
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('columns.customer')}</dt>
-                  <dd className="text-right font-medium">{loan.customer.name}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('print.father_address')}</dt>
-                  <dd className="text-right font-medium">{loan.customer.fatherHusbandName}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('print.address')}</dt>
-                  <dd className="text-right font-medium">{loan.customer.address1}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="shrink-0 text-zinc-500">{tLoan('print.name_mobile')}</dt>
-                  <dd className="text-right font-medium">{loan.customer.mobileNo || '—'}</dd>
-                </div>
-              </dl>
-            </Card>
-
-            <Card className="h-full">
-              <CardTitle>{t('record.settlement')}</CardTitle>
-              {calc ? (
-                <dl className="mt-4 space-y-2 text-sm">
-                  <div className="flex justify-between gap-4">
-                    <dt className="shrink-0 text-zinc-500">{t('record.outstanding')}</dt>
-                    <dd className="text-right font-medium">{formatMoney(oldAmount)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="shrink-0 text-zinc-500">{t('record.interest')}</dt>
-                    <dd className="text-right font-medium">{formatMoney(calc.interestAmount)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="shrink-0 text-zinc-500">{t('record.total_payable')}</dt>
-                    <dd className="text-right font-semibold">{formatMoney(calc.totalPayable)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="shrink-0 text-zinc-500">{t('record.part_paid')}</dt>
-                    <dd className="text-right font-medium">{formatMoney(partPaymentTotal)}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4 border-t border-zinc-100 pt-2">
-                    <dt className="shrink-0 font-medium text-zinc-700">{t('record.amount_due')}</dt>
-                    <dd className="text-right text-lg font-semibold text-emerald-700">
-                      {formatMoney(amountDue)}
-                    </dd>
-                  </div>
-                  {calc.totalMonths != null && (
-                    <div className="flex justify-between gap-4">
-                      <dt className="shrink-0 text-zinc-500">{tLoan('detail.total_months')}</dt>
-                      <dd className="text-right font-medium">{calc.totalMonths}</dd>
-                    </div>
-                  )}
-                </dl>
-              ) : (
-                <p className="mt-4 text-sm text-zinc-500">—</p>
-              )}
-            </Card>
-          </div>
-
-          {loan.loanHistory.length > 0 && (
-            <TableCard className="mb-6">
-              <div className="border-b border-zinc-950/5 px-6 py-4">
-                <CardTitle>{tLoan('detail.loan_history')}</CardTitle>
-              </div>
-              <DataTable>
-                <THead>
-                  <tr>
-                    <TH>{tLoan('detail.sl_no')}</TH>
-                    <TH>{tLoan('detail.history_paid')}</TH>
-                    <TH>{tLoan('detail.history_topup')}</TH>
-                    <TH>{tLoan('detail.history_date')}</TH>
-                  </tr>
-                </THead>
-                <TBody>
-                  {loan.loanHistory.map((entry, index) => (
-                    <tr key={entry.loanId}>
-                      <TD>{index + 1}</TD>
-                      <TD>{formatMoney(entry.paidAmount)}</TD>
-                      <TD>{formatMoney(entry.topUpAmount)}</TD>
-                      <TD>{entry.settledDate ? formatDateIN(entry.settledDate) : '—'}</TD>
-                    </tr>
-                  ))}
-                </TBody>
-              </DataTable>
-            </TableCard>
-          )}
-
-          {loan.items.length > 0 && (
-            <TableCard className="mb-6">
-              <div className="border-b border-zinc-950/5 px-6 py-4">
-                <CardTitle>{tLoan('sections.collateral')}</CardTitle>
-              </div>
-              <DataTable>
-                <THead>
-                  <tr>
-                    <TH>{tLoan('collateral.sub_category')}</TH>
-                    <TH>{tLoan('collateral.item')}</TH>
-                    <TH>{tLoan('collateral.purity')}</TH>
-                    <TH>{tLoan('collateral.qty')}</TH>
-                    <TH>{tLoan('collateral.net_wt')}</TH>
-                  </tr>
-                </THead>
-                <TBody>
-                  {loan.items.map((item) => (
-                    <tr key={item.id}>
-                      <TD>{item.subCategoryName}</TD>
-                      <TD>{item.itemName}</TD>
-                      <TD>
-                        {loan.commodityTypeCode === 'silver'
-                          ? tLoan('collateral.purity_na')
-                          : item.purityName}
-                      </TD>
-                      <TD>{item.noOfItems}</TD>
-                      <TD>{item.netWeight}</TD>
-                    </tr>
-                  ))}
-                </TBody>
-              </DataTable>
-            </TableCard>
-          )}
-
-          {conditionText && (
-            <p className="mb-6 text-sm font-medium text-fuchsia-900">{conditionText}</p>
-          )}
+          <LoanRecordSummary
+            loan={loan}
+            settlementTitle={t('record.settlement')}
+            settlementRows={settlementRows}
+            showLoanHistory
+            extraBadges={
+              isOverdue ? <Badge variant="danger">{t('record.overdue_hint')}</Badge> : undefined
+            }
+          />
 
           {canRenew && (
             <Card className="max-w-2xl">

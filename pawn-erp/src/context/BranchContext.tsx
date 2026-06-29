@@ -37,6 +37,10 @@ export function BranchProvider({ children }: { children: ReactNode }) {
     try {
       const list = await api.get<Branch[]>('/branches');
       setBranches(list);
+      setBranchIdState((current) => {
+        if (list.some((b) => b.id === current)) return current;
+        return list[0]?.id ?? current;
+      });
     } catch {
       /* ignore */
     }

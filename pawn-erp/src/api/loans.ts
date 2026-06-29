@@ -68,13 +68,18 @@ export interface LoanDetail extends LoanListItem {
     id: number;
     subCategoryId: number;
     subCategoryName: string;
+    subCategoryNameTa: string;
     itemId: number;
     itemName: string;
+    itemNameTa: string;
     purityId: number;
     purityName: string;
+    purityNameEn: string;
+    purityNameTa: string;
     noOfItems: number;
     netWeight: number;
   }>;
+  qrCode?: string | null;
   interestCalculation: {
     interestAmount: number;
     totalPayable: number;
@@ -101,6 +106,7 @@ export interface LoanDetail extends LoanListItem {
   organization: {
     companyName: string;
     proprietor: string;
+    qrCodesEnabled?: boolean;
   };
   branch: {
     id: number;

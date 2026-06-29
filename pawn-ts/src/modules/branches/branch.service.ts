@@ -72,3 +72,23 @@ export async function updateBranch(id: number, input: z.infer<typeof updateBranc
 
   return serializeBranch(branch);
 }
+
+export async function deleteBranch(id: number) {
+  const existing = await prisma.branch.findUnique({ where: { id } });
+  if (!existing) throw new AppError(404, 'BRANCH_NOT_FOUND', 'Branch not found');
+  if (!existing.isActive) {
+    throw new AppError(409, 'BRANCH_INACTIVE', 'Branch is already inactive');
+  }
+
+  const activeCount = await prisma.branch.count({ where: { isActive: true } });
+  if (activeCount <= 1) {
+    throw new AppError(409, 'LAST_BRANCH', 'Cannot deactivate the only active branch');
+  }
+
+  const branch = await prisma.branch.update({
+    where: { id },
+    data: { isActive: false },
+  });
+
+  return { id, code: branch.code, name: branch.name, deleted: true };
+}

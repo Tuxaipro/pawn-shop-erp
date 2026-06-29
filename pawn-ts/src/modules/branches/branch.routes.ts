@@ -38,3 +38,13 @@ branchRouter.put('/:id', requirePermission('branches.write'), async (req, res, n
     next(e);
   }
 });
+
+branchRouter.delete('/:id', requirePermission('branches.write'), async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const data = await branchService.deleteBranch(id);
+    sendSuccess(res, data);
+  } catch (e) {
+    next(e);
+  }
+});

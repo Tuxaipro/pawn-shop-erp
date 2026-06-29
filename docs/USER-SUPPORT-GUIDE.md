@@ -2,7 +2,7 @@
 
 **Organization:** Kabilan Pawn Shop  
 **Document version:** 1.0  
-**Last verified:** 15 June 2026  
+**Last verified:** 10 June 2026  
 **Data source:** `legacy/sql/pawnshop26.sql` (production legacy import)  
 **Automated verification:** 34/34 Playwright smoke tests passed (`npm run test:e2e:legacy`)
 
@@ -52,25 +52,36 @@ The left sidebar lists all modules. Optional modules (Bank Loans, Auctions, Inve
 | | |
 |---|---|
 | **Route** | `/` |
-| **Purpose** | Operational overview: open loans, renewals due, cash position, and quick actions. |
+| **Purpose** | Operational overview: today's activity, cash position, stock summary, and quick actions. |
 | **Verified** | ✓ Smoke test passed |
 
 ### What you see
 
-- KPI cards: open loans, amounts disbursed, renewals due, overdue counts.
-- Charts: loan trends, commodity mix, branch performance.
-- Quick actions: New loan, Renew, Part payment, Close loan, Bank batch, Auction.
+- **Quick Actions** — shortcuts to New loan, Renewal, Part payment, Close loan, Bank batch, Auction.
+- **Today's Operations** — counts for **today only** (selected branch, today's business date):
+  - **New customers (today)** — customers registered today in this branch
+  - **New loans (today)** — loans with today's loan date
+  - **Interest collected (today)** — part payments + interest on closes today (not full redemption principal)
+  - **Partial payments** — number of part payments recorded today
+  - **Released loans (today)** — loans fully closed today (renewals are not counted)
+  - **Expenses (today)** — daily book expense + petty cash entries for today
+- **Financial Snapshot** — cash in hand, opening balance, collections, monthly profit.
+- **Inventory & Gold Stock** — weights in grams (2 decimal places).
+- Alerts for renewals due and overdue loans.
 
-### Common tasks
+### How to use (step by step)
 
-1. Review overdue and renewal-due counts at the start of the day.
-2. Click a KPI card or quick action to jump to the relevant module.
-3. Supervisors use role-based sections (cashier vs manager views).
+1. Confirm the correct **branch** is selected in the top toolbar (hidden if you have only one branch).
+2. Review **Quick Actions** and use a button to start the task you need.
+3. Read **Today's Operations** — each card is today's count only, not lifetime totals.
+4. Check **Financial Snapshot** and **Inventory & Gold Stock** for end-of-day context.
+5. Click any card or alert to jump to the related screen.
 
 ### Tips
 
-- Figures reflect the **selected branch** in the toolbar.
-- Large legacy history may take a moment to load on first visit.
+- Figures reflect the **selected branch** and **today's date**.
+- Interest collected does not include principal when a customer redeems a loan.
+- Expenses include petty cash recorded under **Accounts → Daily book** (Petty cash type).
 
 ---
 
@@ -161,10 +172,11 @@ The left sidebar lists all modules. Optional modules (Bank Loans, Auctions, Inve
 1. Select **customer** (search by name or ID).
 2. Enter **receipt number** (invoice no.) — must be unique per branch.
 3. Choose **commodity** (Gold / Silver), **loan condition**, and **customer type**.
-4. Add **collateral items**: sub-category, item type, purity, count, net weight.
+4. Add **collateral items**: sub-category, item type, purity, count, net weight (grams).
 5. Enter **loan amount**; amount in words is generated automatically.
 6. Confirm **interest rate** (from interest slabs) and **renewal date**.
-7. Save and print receipt.
+7. Save, open loan detail, and **print receipt**.
+8. If **Loan item QR codes** are enabled (Settings → Application preferences), one QR code is created automatically for this receipt.
 
 ---
 
@@ -173,8 +185,17 @@ The left sidebar lists all modules. Optional modules (Bank Loans, Auctions, Inve
 | | |
 |---|---|
 | **Route** | `/loans/:id` |
-| **Purpose** | Full view of a single pawn: collateral, payments, renewal history, bank deposit status. |
+| **Purpose** | Full view of a single pawn: collateral, payments, renewal history, bank deposit status, and receipt QR code. |
 | **Verified** | ✓ |
+
+**How to use:**
+
+1. Check the receipt header — receipt number, customer name, and status badge.
+2. If QR codes are enabled, **one QR** appears next to the receipt title (not on each collateral line). Scanning shows: customer name, customer ID, mobile, and receipt number.
+3. Review the Loan and Customer cards.
+4. Check **Interest (as of today)** for amount due on open loans.
+5. Review the **Collateral Items** table.
+6. Use action icons: Print, Renew, Close, or Part payment.
 
 **Actions:** Edit (open loans only), Close, Print, Bank loan, Part payments.
 
@@ -209,14 +230,42 @@ Enter settlement amount, date, and bill options. Security PIN may be required (c
 | | |
 |---|---|
 | **Route** | `/loans/:id/print` |
-| **Purpose** | Print-friendly pawn receipt for the customer. |
+| **Purpose** | Print-friendly pawn receipt for the customer, including QR code when enabled. |
 | **Verified** | ✓ |
+
+**How to use:**
+
+1. Open from loan detail → **Print** icon.
+2. Review customer copy and company copy on screen.
+3. If QR codes are enabled, one QR appears in the receipt header (top right) — one per receipt, not per item line.
+4. Press **Ctrl+P** (or the Print button) and choose your printer.
+5. Hand the customer copy to the customer; keep the company copy in your files.
 
 Opens without the main sidebar for clean printing.
 
 ---
 
-## 5. Part payment (interest)
+### 4.7 QR codes for loan receipts
+
+| | |
+|---|---|
+| **Where shown** | Loan detail (next to receipt title), print receipt header, inventory manage panel |
+| **Purpose** | Quick identity check at the counter — scan with any phone camera or QR app |
+| **Enabled by** | **Settings → Application preferences → Loan item QR codes** (Super Admin) |
+
+**What the QR contains:** Customer name, customer ID, mobile number, and loan receipt number.
+
+**Important:** One QR per **receipt** — not one per collateral item.
+
+**How to use:**
+
+1. Super Admin turns on **Loan item QR codes** and clicks Save (existing open loans are backfilled).
+2. After creating a new loan, open loan detail — QR appears next to the receipt number.
+3. Staff can scan the QR to verify customer name, ID, mobile, and receipt number at the counter.
+4. Print the receipt — QR appears in the header for the customer copy.
+5. In **Inventory**, search by receipt number → **Manage** — the same QR appears at the top of the panel.
+
+---
 
 ### 5.1 Part payment list
 
@@ -318,15 +367,31 @@ Used when loans remain unpaid beyond legal notice period. Links to overdue/defau
 
 ---
 
-## 9. Inventory
+## 9. Inventory / Stock check
 
 | | |
 |---|---|
 | **Route** | `/inventory` |
-| **Purpose** | Product items held for retail sale (e.g. silver articles from auctions or purchases). |
+| **Purpose** | Search pledged collateral by receipt, customer, weight, and status. Assign locker and location for vault items. |
 | **Verified** | ✓ |
 
-Distinct from live pawn collateral (which is tied to open loans).
+This screen tracks **live pawn collateral** tied to open loans — not retail sale stock.
+
+### How to use (step by step)
+
+1. Enter search criteria: receipt number, customer name/phone/ID, status, commodity, or weight range.
+2. Click **Search**. Status summary chips show counts (Available, Bank pledged, Released, etc.).
+3. Click a status chip to filter, or browse the results table.
+4. Click **Manage** on a row to open that receipt's collateral list.
+5. In the manage panel, see all collateral lines. If QR is enabled, **one QR for the whole receipt** appears at the top.
+6. Click **Edit** on an item to set locker number, location, status (lost/damaged/transferred), or notes.
+7. The edit form shows which item you are editing (name and weight). Click **Save** or **Cancel** when done.
+
+### Tips
+
+- Search by receipt number or customer details — there is **no QR scan** in the search box.
+- Weights display with 2 decimal places (e.g. 8.60 g).
+- The QR on the manage panel is the same receipt-level QR shown on loan detail and print.
 
 ---
 
@@ -335,10 +400,25 @@ Distinct from live pawn collateral (which is tied to open loans).
 | | |
 |---|---|
 | **Route** | `/accounts` |
-| **Purpose** | Daily income and expense ledger; vault and counter cash reconciliation. |
+| **Purpose** | Record daily income, expense, and petty cash; view collections from loans; reconcile cash in hand. |
 | **Verified** | ✓ |
 
-Record shop-level cash movements not tied to a single loan transaction.
+### How to use (step by step)
+
+1. Open **Accounts** → **Daily book** tab.
+2. Select today's date (or the date you are closing).
+3. Review summary cards: Opening balance, Cash in hand, Collections, Entries, Closing balance.
+4. To add an entry, choose type: **Income**, **Expense**, or **Petty cash**. Enter amount, category, and who recorded it.
+5. Click **Save entry** — the entry appears in the Daily ledger below (newest first).
+6. **Collections** include part payments and loan close/redemption cash for that day automatically.
+7. Open **Cash position** tab to see vault vs counter split and physical cash reconciliation.
+8. Use **Transfers** tab (multi-branch shops only) to record cash moved between branches.
+
+### Tips
+
+- Petty cash is recorded on the same Daily book form — there is no separate petty tab.
+- Dashboard **Expenses (today)** includes daily book expense + petty cash for today.
+- Single-branch shops do not see the Transfers tab.
 
 ---
 
@@ -427,10 +507,18 @@ Primary branch: **MAIN** — Usilampatti.
 | | |
 |---|---|
 | **Route** | `/settings/preferences` |
-| **Purpose** | Enable/disable optional modules, session timeout, receipt defaults. |
+| **Purpose** | Enable optional modules, QR codes, session timeout, and dashboard refresh. |
 | **Verified** | ✓ |
 
-Toggle: Bank Loans, Auctions, Investments, GL, Notifications.
+**How to use (Super Admin only):**
+
+1. Open **Settings → Application preferences**.
+2. Set **Dashboard auto-refresh** interval (minimum 30 seconds).
+3. Set **Session timeout** — users are logged out after this many minutes of inactivity.
+4. Toggle **Loan item QR codes** — when ON, each receipt gets one QR showing customer name, ID, mobile, and receipt number (loan detail, inventory manage panel, and print).
+5. Enable optional modules as needed: Bank Loans, Auctions, Investments, GL, Notifications.
+6. Click **Save** — sidebar and features update immediately.
+7. When you turn QR codes ON, open loans are backfilled automatically.
 
 ---
 
@@ -528,6 +616,15 @@ Rates differ for **general customers** vs **other shop** loans.
 Customers → New Customer → Save → Loans → New Pawn Loan → Print receipt
 ```
 
+If QR codes are enabled, the receipt includes a scannable QR with customer name, ID, mobile, and receipt number.
+
+### Verify customer at counter (QR)
+
+```
+Loans → search receipt → scan QR on detail page
+OR Inventory → search receipt → Manage → scan QR at top of panel
+```
+
 ### Renewal
 
 ```
@@ -568,9 +665,12 @@ Legacy smoke tests are **read-only** — they do not create E2E test customers o
 | Cannot edit a loan | Loan may be closed (`is_settled = 1`). Only open loans are editable. |
 | Receipt number already exists | Invoice numbers are unique per branch. Use the next available number. |
 | Module missing from sidebar | Enable it under **Settings → Application preferences**. |
+| QR code not showing | Enable **Loan item QR codes** under Settings → Application preferences (Super Admin). |
+| QR scan in inventory search | QR scan is not available in inventory search — search by receipt number or customer details instead. |
 | Session expired | Default idle timeout is 30 minutes. Sign in again. |
 | Interest rate not auto-filling | Check **Masters → Interest declarations** for the commodity and amount slab. |
 | Tamil text on receipts | Ensure customer and item names were entered in master data; language switcher affects UI only. |
+| Dashboard numbers look wrong | **Today's Operations** shows today only — interest excludes redemption principal; released loans exclude renewals. |
 
 ---
 
@@ -578,6 +678,7 @@ Legacy smoke tests are **read-only** — they do not create E2E test customers o
 
 | Date | Change |
 |------|--------|
+| 10 Jun 2026 | Dashboard today's metrics, receipt QR codes, inventory stock-check workflow, daily book steps |
 | 15 Jun 2026 | Initial guide from legacy import + 34 passing smoke tests |
 
 For legacy system behaviour reference, see [`generated/Existing-System.md`](../generated/Existing-System.md).

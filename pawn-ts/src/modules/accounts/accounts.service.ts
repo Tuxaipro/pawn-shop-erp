@@ -1,6 +1,7 @@
 import { prisma } from '../../lib/prisma.js';
 import { dec } from '../../lib/loan-helper.js';
 import { parseDateOnly, formatDateOnly } from '../../lib/loan-dates.js';
+import { sumDenominations, type DenominationInput } from '../../lib/cash-denominations.js';
 import { AppError } from '../../shared/errors.js';
 import type { Prisma } from '@prisma/client';
 
@@ -34,6 +35,53 @@ async function settledLoansInRange(branchId: number, start: Date, end: Date) {
   });
 }
 
+async function getCashLimit(): Promise<number> {
+  const org = await prisma.organizationSettings.findUnique({ where: { id: 1 } });
+  return org?.cashLimit ? dec(org.cashLimit) : 0;
+}
+
+function computeBookClosingBalance(
+  opening: number,
+  summary: { income: number; expense: number; pettyCash: number; topUp: number },
+  txns: { collections: number; disbursements: number; shopBankDeposits: number }
+) {
+  return (
+    opening +
+    summary.income +
+    summary.topUp +
+    txns.collections -
+    summary.expense -
+    summary.pettyCash -
+    txns.disbursements -
+    txns.shopBankDeposits
+  );
+}
+
+async function saveDenominations(balanceId: number, items: DenominationInput[]) {
+  await prisma.cashDenominationCount.deleteMany({ where: { balanceId } });
+  const rows = items.filter((d) => d.quantity > 0);
+  if (rows.length === 0) return;
+  await prisma.cashDenominationCount.createMany({
+    data: rows.map((d) => ({
+      balanceId,
+      denomination: d.denomination,
+      quantity: d.quantity,
+    })),
+  });
+}
+
+async function loadDenominations(balanceId: number) {
+  const rows = await prisma.cashDenominationCount.findMany({
+    where: { balanceId },
+    orderBy: { denomination: 'desc' },
+  });
+  return rows.map((r) => ({
+    denomination: r.denomination,
+    quantity: r.quantity,
+    subtotal: r.denomination * r.quantity,
+  }));
+}
+
 async function ensureDailyBalanceRow(branchId: number, balanceDate: Date) {
   let row = await prisma.dailyCashBalance.findUnique({
     where: { branchId_balanceDate: { branchId, balanceDate } },
@@ -44,14 +92,19 @@ async function ensureDailyBalanceRow(branchId: number, balanceDate: Date) {
     const prev = await prisma.dailyCashBalance.findUnique({
       where: { branchId_balanceDate: { branchId, balanceDate: prevDate } },
     });
-    const opening = prev?.closingBalance ? dec(prev.closingBalance) : 0;
+    // Opening = previous day's actual counted cash (Closing balance Current);
+    // fall back to the book closing balance if no physical count was recorded.
+    const opening =
+      prev?.physicalCount != null
+        ? dec(prev.physicalCount)
+        : prev?.closingBalance != null
+          ? dec(prev.closingBalance)
+          : 0;
     row = await prisma.dailyCashBalance.create({
       data: {
         branchId,
         balanceDate,
         openingBalance: opening,
-        vaultCash: prev ? dec(prev.vaultCash) : 0,
-        counterCash: prev ? dec(prev.counterCash) : 0,
       },
     });
   }
@@ -61,13 +114,20 @@ async function ensureDailyBalanceRow(branchId: number, balanceDate: Date) {
 function entryCategoryLabel(category: number) {
   if (category === 1) return 'Income';
   if (category === 2) return 'Expense';
+  if (category === 4) return 'Top-up';
   return 'Petty cash';
 }
 
 function ledgerTypeForCategory(category: number) {
   if (category === 1) return 'income';
   if (category === 2) return 'expense';
+  if (category === 4) return 'topup';
   return 'petty_cash';
+}
+
+/** Categories that bring cash in (income, top-up); all others move cash out. */
+function isCashInCategory(category: number) {
+  return category === 1 || category === 4;
 }
 
 export async function listEntries(params: {
@@ -170,10 +230,12 @@ export async function getDailySummary(date: string, branchId = 1) {
   let income = 0;
   let expense = 0;
   let pettyCash = 0;
+  let topUp = 0;
   for (const r of rows) {
     const amt = dec(r.amount);
     if (r.category === 1) income += amt;
     else if (r.category === 2) expense += amt;
+    else if (r.category === 4) topUp += amt;
     else pettyCash += amt;
   }
 
@@ -183,7 +245,8 @@ export async function getDailySummary(date: string, branchId = 1) {
     income,
     expense,
     pettyCash,
-    net: income - expense - pettyCash,
+    topUp,
+    net: income + topUp - expense - pettyCash,
     entryCount: rows.length,
   };
 }
@@ -191,7 +254,8 @@ export async function getDailySummary(date: string, branchId = 1) {
 async function getDayTransactions(date: string, branchId: number) {
   const { start, end } = dayRange(date);
 
-  const [partPayments, settledLoans, newLoans, transfersIn, transfersOut] = await Promise.all([
+  const [partPayments, settledLoans, newLoans, transfersIn, transfersOut, shopDeposits] =
+    await Promise.all([
     prisma.loanPartPayment.aggregate({
       where: { payDate: { gte: start, lt: end }, loan: { branchId } },
       _sum: { amount: true },
@@ -208,6 +272,10 @@ async function getDayTransactions(date: string, branchId: number) {
     }),
     prisma.cashTransfer.aggregate({
       where: { fromBranchId: branchId, transferDate: { gte: start, lt: end } },
+      _sum: { amount: true },
+    }),
+    prisma.cashShopDeposit.aggregate({
+      where: { branchId, depositDate: { gte: start, lt: end } },
       _sum: { amount: true },
     }),
   ]);
@@ -227,6 +295,7 @@ async function getDayTransactions(date: string, branchId: number) {
     newLoanCount: newLoans._count,
     transfersIn: dec(transfersIn._sum.amount ?? 0),
     transfersOut: dec(transfersOut._sum.amount ?? 0),
+    shopBankDeposits: dec(shopDeposits._sum.amount ?? 0),
   };
 }
 
@@ -237,15 +306,21 @@ export async function getDailyBalance(date: string, branchId: number) {
   const summary = await getDailySummary(date, branchId);
   const txns = await getDayTransactions(date, branchId);
   const opening = dec(row.openingBalance);
+  const bookClosingBalance = computeBookClosingBalance(opening, summary, txns);
   const cashInHand =
     opening +
     summary.income +
+    summary.topUp +
     txns.collections +
     txns.transfersIn -
     summary.expense -
     summary.pettyCash -
     txns.disbursements -
-    txns.transfersOut;
+    txns.transfersOut -
+    txns.shopBankDeposits;
+
+  const cashLimit = await getCashLimit();
+  const denominations = await loadDenominations(row.id);
 
   const { date: _d, branchId: _b, ...summaryRest } = summary;
 
@@ -254,23 +329,30 @@ export async function getDailyBalance(date: string, branchId: number) {
     branchId,
     openingBalance: opening,
     closingBalance: row.closingBalance ? dec(row.closingBalance) : null,
-    vaultCash: dec(row.vaultCash),
-    counterCash: dec(row.counterCash),
     physicalCount: row.physicalCount ? dec(row.physicalCount) : null,
+    recommendedBankDeposit: row.recommendedBankDeposit ? dec(row.recommendedBankDeposit) : null,
+    denominations,
     isClosed: row.isClosed,
     cashInHand,
+    bookClosingBalance,
+    closingVariance: row.closingVariance ? dec(row.closingVariance) : null,
+    cashLimit,
+    cashOverLimit: cashLimit > 0 && cashInHand > cashLimit,
+    excessCash: cashLimit > 0 ? Math.max(0, cashInHand - cashLimit) : 0,
     ...summaryRest,
     ...txns,
     variance:
-      row.physicalCount && row.closingBalance
-        ? dec(row.physicalCount) - dec(row.closingBalance)
-        : null,
+      row.closingVariance != null
+        ? dec(row.closingVariance)
+        : row.physicalCount && row.closingBalance
+          ? dec(row.physicalCount) - dec(row.closingBalance)
+          : null,
   };
 }
 
 export async function setOpeningBalance(
   branchId: number,
-  input: { date: string; openingBalance: number; vaultCash?: number; counterCash?: number }
+  input: { date: string; openingBalance: number }
 ) {
   const balanceDate = parseDateOnly(input.date);
   const existing = await prisma.dailyCashBalance.findUnique({
@@ -286,21 +368,15 @@ export async function setOpeningBalance(
       branchId,
       balanceDate,
       openingBalance: input.openingBalance,
-      vaultCash: input.vaultCash ?? 0,
-      counterCash: input.counterCash ?? 0,
     },
     update: {
       openingBalance: input.openingBalance,
-      ...(input.vaultCash !== undefined ? { vaultCash: input.vaultCash } : {}),
-      ...(input.counterCash !== undefined ? { counterCash: input.counterCash } : {}),
     },
   });
 
   return {
     date: input.date,
     openingBalance: dec(row.openingBalance),
-    vaultCash: dec(row.vaultCash),
-    counterCash: dec(row.counterCash),
   };
 }
 
@@ -308,10 +384,8 @@ export async function closeDay(
   branchId: number,
   input: {
     date: string;
-    closingBalance: number;
     physicalCount?: number;
-    vaultCash?: number;
-    counterCash?: number;
+    denominations?: DenominationInput[];
     notes?: string;
   },
   userId?: number
@@ -324,26 +398,73 @@ export async function closeDay(
     throw new AppError(409, 'DAY_CLOSED', 'Day already closed');
   }
 
+  const summary = await getDailySummary(input.date, branchId);
+  const txns = await getDayTransactions(input.date, branchId);
+  const rowBeforeClose = await ensureDailyBalanceRow(branchId, balanceDate);
+  const bookClosingBalance = computeBookClosingBalance(
+    dec(rowBeforeClose.openingBalance),
+    summary,
+    txns
+  );
+
+  const denomTotal =
+    input.denominations && input.denominations.length > 0
+      ? sumDenominations(input.denominations)
+      : null;
+
+  if (denomTotal != null && denomTotal <= 0) {
+    throw new AppError(422, 'VALIDATION_ERROR', 'Enter at least one note or coin count');
+  }
+
+  const physicalCount =
+    denomTotal != null ? denomTotal : input.physicalCount;
+
+  if (physicalCount == null || physicalCount < 0) {
+    throw new AppError(
+      422,
+      'VALIDATION_ERROR',
+      'Physical cash count is required — enter note denominations or total count'
+    );
+  }
+
+  if (
+    denomTotal != null &&
+    input.physicalCount != null &&
+    Math.abs(denomTotal - input.physicalCount) > 0.01
+  ) {
+    throw new AppError(
+      422,
+      'VALIDATION_ERROR',
+      'Denomination total does not match physical count'
+    );
+  }
+
+  const cashLimit = await getCashLimit();
+  const recommendedBankDeposit =
+    cashLimit > 0 ? Math.max(0, physicalCount - cashLimit) : 0;
+
+  const closingVariance = physicalCount - bookClosingBalance;
+
   const row = await prisma.dailyCashBalance.upsert({
     where: { branchId_balanceDate: { branchId, balanceDate } },
     create: {
       branchId,
       balanceDate,
-      openingBalance: 0,
-      closingBalance: input.closingBalance,
-      physicalCount: input.physicalCount,
-      vaultCash: input.vaultCash ?? 0,
-      counterCash: input.counterCash ?? 0,
+      openingBalance: rowBeforeClose.openingBalance,
+      closingBalance: bookClosingBalance,
+      physicalCount,
+      closingVariance,
+      recommendedBankDeposit: recommendedBankDeposit > 0 ? recommendedBankDeposit : null,
       isClosed: true,
       closedOn: new Date(),
       closedBy: userId,
       notes: input.notes ?? '',
     },
     update: {
-      closingBalance: input.closingBalance,
-      physicalCount: input.physicalCount,
-      ...(input.vaultCash !== undefined ? { vaultCash: input.vaultCash } : {}),
-      ...(input.counterCash !== undefined ? { counterCash: input.counterCash } : {}),
+      closingBalance: bookClosingBalance,
+      physicalCount,
+      closingVariance,
+      recommendedBankDeposit: recommendedBankDeposit > 0 ? recommendedBankDeposit : null,
       isClosed: true,
       closedOn: new Date(),
       closedBy: userId,
@@ -351,15 +472,22 @@ export async function closeDay(
     },
   });
 
+  if (input.denominations) {
+    await saveDenominations(row.id, input.denominations);
+  }
+
+  const denominations = await loadDenominations(row.id);
+
   return {
     date: input.date,
     closingBalance: dec(row.closingBalance!),
-    physicalCount: row.physicalCount ? dec(row.physicalCount) : null,
+    physicalCount: dec(row.physicalCount!),
+    bookClosingBalance,
+    closingVariance,
+    recommendedBankDeposit: recommendedBankDeposit > 0 ? recommendedBankDeposit : null,
+    denominations,
     isClosed: true,
-    variance:
-      row.physicalCount && row.closingBalance
-        ? dec(row.physicalCount) - dec(row.closingBalance)
-        : null,
+    variance: closingVariance,
   };
 }
 
@@ -432,6 +560,69 @@ export async function createTransfer(
   };
 }
 
+export async function listShopBankDeposits(branchId: number, fromDate?: string, toDate?: string) {
+  const where: { branchId: number; depositDate?: { gte?: Date; lte?: Date } } = { branchId };
+  if (fromDate || toDate) {
+    where.depositDate = {};
+    if (fromDate) where.depositDate.gte = parseDateOnly(fromDate);
+    if (toDate) where.depositDate.lte = parseDateOnly(toDate);
+  }
+
+  const rows = await prisma.cashShopDeposit.findMany({
+    where,
+    orderBy: [{ depositDate: 'desc' }, { id: 'desc' }],
+    take: 100,
+  });
+
+  return rows.map((r) => ({
+    id: r.id,
+    amount: dec(r.amount),
+    bankName: r.bankName,
+    reference: r.reference,
+    depositDate: formatDateOnly(r.depositDate),
+    notes: r.notes,
+    createdOn: r.createdOn.toISOString(),
+  }));
+}
+
+export async function createShopBankDeposit(
+  branchId: number,
+  input: {
+    amount: number;
+    bankName: string;
+    reference?: string;
+    depositDate: string;
+    notes?: string;
+  },
+  userId?: number
+) {
+  const depositDate = parseDateOnly(input.depositDate);
+  const balanceRow = await ensureDailyBalanceRow(branchId, depositDate);
+  if (balanceRow.isClosed) {
+    throw new AppError(409, 'DAY_CLOSED', 'Cannot record deposit on a closed day');
+  }
+
+  const row = await prisma.cashShopDeposit.create({
+    data: {
+      branchId,
+      amount: input.amount,
+      bankName: input.bankName,
+      reference: input.reference ?? '',
+      depositDate,
+      notes: input.notes ?? '',
+      createdBy: userId,
+    },
+  });
+
+  return {
+    id: row.id,
+    amount: dec(row.amount),
+    bankName: row.bankName,
+    reference: row.reference,
+    depositDate: formatDateOnly(row.depositDate),
+  };
+}
+
 function ledgerRow(input: {
   sortAt: Date;
   recordedBy?: string | null;
@@ -458,7 +649,7 @@ export async function getUnifiedLedger(date: string, branchId: number) {
   const summary = await getDailySummary(date, branchId);
   const balance = await getDailyBalance(date, branchId);
 
-  const [entries, partPayments, settledLoans, newLoans] = await Promise.all([
+  const [entries, partPayments, settledLoans, newLoans, shopDeposits] = await Promise.all([
     prisma.incomeExpense.findMany({
       where: { branchId, entryDate: { gte: start, lt: end } },
     }),
@@ -475,6 +666,9 @@ export async function getUnifiedLedger(date: string, branchId: number) {
       where: { branchId, loanDate: { gte: start, lt: end } },
       include: { customer: { select: { name: true } } },
     }),
+    prisma.cashShopDeposit.findMany({
+      where: { branchId, depositDate: { gte: start, lt: end } },
+    }),
   ]);
 
   const ledger = [
@@ -485,7 +679,7 @@ export async function getUnifiedLedger(date: string, branchId: number) {
         type: ledgerTypeForCategory(e.category),
         description: e.description,
         amount: dec(e.amount),
-        direction: e.category === 1 ? 'in' : 'out',
+        direction: isCashInCategory(e.category) ? 'in' : 'out',
         ref: `IE-${e.id}`,
       })
     ),
@@ -520,6 +714,16 @@ export async function getUnifiedLedger(date: string, branchId: number) {
         amount: dec(l.loanAmount),
         direction: 'out',
         ref: `LN-${l.id}`,
+      })
+    ),
+    ...shopDeposits.map((d) =>
+      ledgerRow({
+        sortAt: d.createdOn,
+        type: 'bank_deposit',
+        description: `Cash deposited to bank — ${d.bankName}${d.reference ? ` (${d.reference})` : ''}`,
+        amount: dec(d.amount),
+        direction: 'out',
+        ref: `BD-${d.id}`,
       })
     ),
   ];

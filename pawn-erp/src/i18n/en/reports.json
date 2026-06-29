@@ -1,0 +1,23 @@
+{
+  "title": "Reports",
+  "subtitle": "Daily, monthly & operational reports",
+  "categories": {
+    "daily": "Daily",
+    "monthly": "Monthly"
+  },
+  "types": {
+    "daily_book": "Daily book",
+    "collections": "Collections",
+    "loan_register": "Loan register",
+    "renewals": "Renewals",
+    "interest": "Interest collections",
+    "auctions": "Auctions",
+    "overdue": "Overdue loans",
+    "monthly_profit": "Monthly profit",
+    "investment_ledger": "Investment ledger",
+    "customer_growth": "Customer growth",
+    "bank_deposits": "Bank deposits",
+    "pay_advance": "Pay advances"
+  },
+  "report_types": "Report types"
+}

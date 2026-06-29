@@ -16,7 +16,7 @@ function formatMoney(value: number) {
 }
 
 export function GlPage() {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['gl', 'common']);
   const { branchId } = useBranch();
   const queryClient = useQueryClient();
   const today = new Date().toISOString().slice(0, 10);
@@ -78,21 +78,21 @@ export function GlPage() {
   const journalRows = (journal as Array<Record<string, unknown>>) ?? [];
   const subData = subLedger as { accountName?: string; balance?: number; lines?: Array<Record<string, unknown>> };
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'trial', label: 'Trial balance' },
-    { id: 'accounts', label: 'Chart of accounts' },
-    { id: 'journal', label: 'Journal' },
-    { id: 'sub-ledger', label: 'Sub-ledger' },
+  const tabs: { id: Tab; labelKey: string }[] = [
+    { id: 'trial', labelKey: 'tabs.trial' },
+    { id: 'accounts', labelKey: 'tabs.accounts' },
+    { id: 'journal', labelKey: 'tabs.journal' },
+    { id: 'sub-ledger', labelKey: 'tabs.sub_ledger' },
   ];
 
   return (
     <div>
-      <PageHeader title={t('nav.gl')} subtitle="General ledger, journal & sub-ledgers" />
+      <PageHeader title={t('gl:title')} subtitle={t('gl:subtitle')} />
 
       <div className="mb-4 flex flex-wrap gap-2">
         {tabs.map((tb) => (
           <Button key={tb.id} type="button" variant={tab === tb.id ? 'primary' : 'secondary'} onClick={() => setTab(tb.id)}>
-            {tb.label}
+            {t(`gl:${tb.labelKey}`)}
           </Button>
         ))}
         {tab === 'journal' && (

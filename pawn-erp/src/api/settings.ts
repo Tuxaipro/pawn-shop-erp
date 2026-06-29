@@ -4,21 +4,29 @@ import type { ModuleFlags } from '../lib/appModules';
 export interface OrganizationSettings {
   companyName: string;
   proprietor: string;
+  logoUrl: string;
+  receiptLanguage: string;
   dashboardRefreshSeconds: number;
   sessionTimeoutMinutes: number;
+  qrCodesEnabled: boolean;
+  cashLimit: number;
   modules: ModuleFlags;
   updatedOn?: string;
 }
 
-export type OrganizationProfileInput = {
-  companyName: string;
-  proprietor?: string;
-};
-
 export type AppPreferencesInput = {
   dashboardRefreshSeconds?: number;
   sessionTimeoutMinutes?: number;
+  qrCodesEnabled?: boolean;
+  cashLimit?: number;
+  receiptLanguage?: string;
   modules?: Partial<ModuleFlags>;
+};
+
+export type OrganizationProfileInput = {
+  companyName: string;
+  proprietor?: string;
+  logoUrl?: string;
 };
 
 export const settingsApi = {

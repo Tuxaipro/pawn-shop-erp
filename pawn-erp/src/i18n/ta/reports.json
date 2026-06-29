@@ -1,0 +1,23 @@
+{
+  "title": "அறிக்கைகள்",
+  "subtitle": "தினசரி, மாதாந்திர & செயல்பாட்டு அறிக்கைகள்",
+  "categories": {
+    "daily": "தினசரி",
+    "monthly": "மாதாந்திர"
+  },
+  "types": {
+    "daily_book": "தினசரி புத்தகம்",
+    "collections": "வசூல்",
+    "loan_register": "கடன் பதிவேடு",
+    "renewals": "புதுப்பிப்புகள்",
+    "interest": "வட்டி வசூல்",
+    "auctions": "ஏலம்",
+    "overdue": "காலாவதி கடன்கள்",
+    "monthly_profit": "மாத லாபம்",
+    "investment_ledger": "முதலீட்டு பதிவேடு",
+    "customer_growth": "வாடிக்கையாளர் வளர்ச்சி",
+    "bank_deposits": "வங்கி வைப்புகள்",
+    "pay_advance": "முன்பணம்"
+  },
+  "report_types": "அறிக்கை வகைகள்"
+}

@@ -49,11 +49,11 @@ inventoryRouter.get('/overdue', async (req, res, next) => {
   }
 });
 
-inventoryRouter.get('/barcode', async (req, res, next) => {
+inventoryRouter.get('/qr', async (req, res, next) => {
   try {
     const code = z.string().min(1).parse(req.query.code);
     const branchId = branchFromQuery(req);
-    const data = await inventoryService.searchByBarcode(code, branchId);
+    const data = await inventoryService.searchByQrCode(code, branchId);
     sendSuccess(res, data);
   } catch (e) {
     next(e);
@@ -66,8 +66,6 @@ inventoryRouter.patch('/items/:itemId/meta', async (req, res, next) => {
     const branchId = branchFromQuery(req);
     const body = z
       .object({
-        barcode: z.string().max(50).optional(),
-        qrCode: z.string().max(100).optional(),
         location: z.string().max(100).optional(),
         lockerNo: z.string().max(50).optional(),
         photoUrl: z.string().max(500).optional(),

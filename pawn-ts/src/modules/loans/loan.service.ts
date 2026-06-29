@@ -9,6 +9,7 @@ import {
   type CustomerTypeCode,
 } from '../../lib/interest.js';
 import { computeRenewalDate, formatDateOnly, parseDateOnly } from '../../lib/loan-dates.js';
+import { assignQrCodeToLoan, buildLoanQrPayload, isQrCodesEnabled } from '../../lib/loan-item-qr.js';
 import { assertSecurityPin } from '../../lib/security.js';
 import { assertLoanInBranch } from '../../lib/branch.js';
 import { AppError } from '../../shared/errors.js';
@@ -135,18 +136,23 @@ function serializeLoanItem(row: {
   purityId: number;
   noOfItems: number;
   netWeight: Prisma.Decimal;
-  subCategory: { nameEn: string };
-  item: { nameEn: string };
+  subCategory: { nameEn: string; nameTa: string };
+  item: { nameEn: string; nameTa: string };
   purity: { nameTamil: string; nameEng: string };
+  inventoryMeta?: { itemStatus: string | null } | null;
 }) {
   return {
     id: Number(row.id),
     subCategoryId: row.subCategoryId,
     subCategoryName: row.subCategory.nameEn,
+    subCategoryNameTa: row.subCategory.nameTa,
     itemId: Number(row.itemId),
     itemName: row.item.nameEn,
+    itemNameTa: row.item.nameTa,
     purityId: row.purityId,
     purityName: row.purity.nameTamil,
+    purityNameEn: row.purity.nameEng,
+    purityNameTa: row.purity.nameTamil,
     noOfItems: row.noOfItems,
     netWeight: dec(row.netWeight),
   };
@@ -334,6 +340,19 @@ export async function getLoanById(id: number, branchId: number) {
   const organization = await getOrganizationSettings();
   const openBankDeposits = row.bankDeposits.filter((b) => !b.isBankSettled);
 
+  const qrEnabled = await isQrCodesEnabled();
+  const qrCode =
+    qrEnabled && row.qrCode
+      ? row.qrCode
+      : qrEnabled
+        ? buildLoanQrPayload({
+            customerName: row.customer.name,
+            customerId: Number(row.customer.customerId),
+            mobileNo: row.customer.mobileNo,
+            receiptNo: Number(row.invoiceNo),
+          })
+        : null;
+
   return {
     id: Number(row.id),
     invoiceNo: Number(row.invoiceNo),
@@ -362,6 +381,7 @@ export async function getLoanById(id: number, branchId: number) {
     oldLoanId: row.oldLoanId,
     defaultStatus: row.defaultStatus,
     customer: serializeCustomer(row.customer),
+    qrCode,
     organization,
     branch: {
       id: row.branch.id,
@@ -498,6 +518,8 @@ export async function createLoan(input: CreateLoanInput, branchId: number, userI
     return created;
   });
 
+  await assignQrCodeToLoan(Number(loan.id));
+
   return {
     id: Number(loan.id),
     invoiceNo: Number(loan.invoiceNo),
@@ -556,6 +578,8 @@ export async function updateLoan(id: number, input: UpdateLoanInput, branchId: n
       },
     });
   });
+
+  await assignQrCodeToLoan(Number(loan.id));
 
   return {
     id: Number(loan.id),

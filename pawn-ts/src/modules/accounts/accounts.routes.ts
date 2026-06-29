@@ -8,6 +8,7 @@ import {
   createEntrySchema,
   listEntriesQuerySchema,
   openingBalanceSchema,
+  shopBankDepositSchema,
 } from './accounts.schema.js';
 import * as accountsService from './accounts.service.js';
 
@@ -118,6 +119,29 @@ accountsRouter.post('/transfers', async (req, res, next) => {
     const body = cashTransferSchema.parse(req.body);
     const branchId = resolveBranchId(req, body.branchId);
     const data = await accountsService.createTransfer(branchId, body, req.user?.sub);
+    sendSuccess(res, data, 201);
+  } catch (e) {
+    next(e);
+  }
+});
+
+accountsRouter.get('/shop-deposits', async (req, res, next) => {
+  try {
+    const branchId = branchFromQuery(req);
+    const fromDate = req.query.fromDate as string | undefined;
+    const toDate = req.query.toDate as string | undefined;
+    const data = await accountsService.listShopBankDeposits(branchId, fromDate, toDate);
+    sendSuccess(res, data);
+  } catch (e) {
+    next(e);
+  }
+});
+
+accountsRouter.post('/shop-deposits', async (req, res, next) => {
+  try {
+    const body = shopBankDepositSchema.parse(req.body);
+    const branchId = resolveBranchId(req, body.branchId);
+    const data = await accountsService.createShopBankDeposit(branchId, body, req.user?.sub);
     sendSuccess(res, data, 201);
   } catch (e) {
     next(e);

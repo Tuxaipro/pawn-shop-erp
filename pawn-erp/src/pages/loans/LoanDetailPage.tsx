@@ -3,11 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
 import { loansApi, type LoanDetail } from '../../api/loans';
 import { useBranch } from '../../context/BranchContext';
+import { useModuleSettings } from '../../context/ModuleSettingsContext';
+import { LoanItemQr } from '../../components/LoanItemQr';
 import { LoanRelatedTabs } from '../../components/loans/LoanRelatedTabs';
 import { CloseLoanIcon, PaymentIcon, PrintIcon, RenewIcon } from '../../components/ui/icons';
 import { formatAmountInWords } from '../../lib/amountInWords';
 import { formatLoanConditionText } from '../../lib/loanConditionText';
 import { formatDateIN } from '../../lib/formatDate';
+import { localizedCommodity, localizedItemNames } from '../../lib/localizedItem';
 import { cn } from '../../lib/cn';
 import { PageHeader } from '../../components/PageHeader';
 import { Badge } from '../../components/ui/Badge';
@@ -34,8 +37,9 @@ const iconClass =
   'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-zinc-500 ring-1 ring-zinc-950/10 transition hover:bg-zinc-950/5 hover:text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 disabled:pointer-events-none disabled:opacity-40';
 
 export function LoanDetailPage() {
-  const { t } = useTranslation(['loan', 'common']);
+  const { t, i18n } = useTranslation(['loan', 'common']);
   const { branchId } = useBranch();
+  const { qrCodesEnabled } = useModuleSettings();
   const { id } = useParams<{ id: string }>();
   const loanId = Number(id);
 
@@ -72,6 +76,11 @@ export function LoanDetailPage() {
               {statusLabel(loan, t)}
             </Badge>
           </span>
+        }
+        aside={
+          qrCodesEnabled && loan.qrCode ? (
+            <LoanItemQr value={loan.qrCode} size={96} className="shrink-0" />
+          ) : undefined
         }
         actions={
           <div className="flex flex-wrap items-center gap-1">
@@ -169,7 +178,9 @@ export function LoanDetailPage() {
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-zinc-500">{t('fields.commodity')}</dt>
-              <dd className="font-medium">{loan.commodityTypeLabel}</dd>
+              <dd className="font-medium">
+                {localizedCommodity(loan.commodityTypeCode, loan.commodityTypeLabel, i18n.language)}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-zinc-500">{t('fields.customer_type')}</dt>
@@ -341,18 +352,23 @@ export function LoanDetailPage() {
             </tr>
           </THead>
           <TBody>
-            {loan.items.map((item, index) => (
-              <tr key={item.id}>
-                <TD>{index + 1}</TD>
-                <TD>{item.subCategoryName}</TD>
-                <TD>{item.itemName}</TD>
-                <TD>
-                  {loan.commodityTypeCode === 'silver' ? t('collateral.purity_na') : item.purityName}
-                </TD>
-                <TD>{item.noOfItems}</TD>
-                <TD>{item.netWeight}</TD>
-              </tr>
-            ))}
+            {loan.items.map((item, index) => {
+              const names = localizedItemNames(item, i18n.language);
+              return (
+                <tr key={item.id}>
+                  <TD>{index + 1}</TD>
+                  <TD>{names.subCategory}</TD>
+                  <TD>{names.item}</TD>
+                  <TD>
+                    {loan.commodityTypeCode === 'silver'
+                      ? t('collateral.purity_na')
+                      : names.purity}
+                  </TD>
+                  <TD>{item.noOfItems}</TD>
+                  <TD>{item.netWeight}</TD>
+                </tr>
+              );
+            })}
           </TBody>
         </DataTable>
       </TableCard>

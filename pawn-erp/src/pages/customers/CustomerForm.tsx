@@ -7,6 +7,7 @@ import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card, CardTitle } from '../../components/ui/Card';
 import { Field, Input, Textarea } from '../../components/ui/Input';
+import { formatDateTimeIN } from '../../lib/formatDate';
 
 export interface CustomerFormSubmitResult {
   data: CustomerFormData;
@@ -52,12 +53,7 @@ const emptyForm = (initial?: Partial<CustomerFormData>): CustomerFormData => ({
   blacklistReason: initial?.blacklistReason ?? '',
 });
 
-function formatWhen(iso: string) {
-  return new Date(iso).toLocaleString(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
-}
+const formatWhen = formatDateTimeIN;
 
 export function CustomerForm({
   initial,

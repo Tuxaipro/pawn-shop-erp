@@ -7,6 +7,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Card, CardTitle } from '../../components/ui/Card';
+import { formatDateTimeIN } from '../../lib/formatDate';
 
 export function CustomerDetailPage() {
   const { t } = useTranslation(['customer', 'common']);
@@ -38,7 +39,7 @@ export function CustomerDetailPage() {
           )}
           {customer.blacklistedAt && (
             <p className="mt-1 text-xs text-red-600">
-              {t('fields.blacklisted_at')}: {new Date(customer.blacklistedAt).toLocaleString()}
+              {t('fields.blacklisted_at')}: {formatDateTimeIN(customer.blacklistedAt)}
             </p>
           )}
         </div>

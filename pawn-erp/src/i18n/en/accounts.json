@@ -1,0 +1,118 @@
+{
+  "title": "Daily Book & Cash",
+  "subtitle": "Single cash register — daily ledger, note counts at close, bank deposits",
+  "tabs": {
+    "book": "Daily book",
+    "close": "Day close",
+    "transfers": "Transfers"
+  },
+  "fields": {
+    "date": "Date",
+    "opening_balance": "Opening balance",
+    "recorded_by": "Recorded by",
+    "category": "Category",
+    "description": "Description",
+    "amount": "Amount",
+    "bank_name": "Bank name",
+    "reference": "Reference / slip no.",
+    "notes": "Notes",
+    "to_branch": "To branch",
+    "from_branch": "From branch",
+    "transfer_date": "Transfer date",
+    "transfer_amount": "Transfer amount",
+    "system_closing": "Closing balance (Current)",
+    "book_closing": "Closing balance (book)",
+    "variance": "Difference"
+  },
+  "placeholders": {
+    "staff_name": "Staff name",
+    "select_category": "Select category",
+    "bank_example": "e.g. TMB, SBI",
+    "select_branch": "Select branch"
+  },
+  "categories": {
+    "income": "Income",
+    "expense": "Expense",
+    "petty": "Petty cash",
+    "topup": "Top-up"
+  },
+  "cards": {
+    "opening": "Opening",
+    "cash_in_hand": "Cash in hand",
+    "collections": "Collections",
+    "disbursements": "Disbursements",
+    "entries": "Entries",
+    "transfers": "Transfers",
+    "closing_balance": "Closing balance"
+  },
+  "hints": {
+    "disbursements": "New loans paid out",
+    "entries": "Income / expense / petty",
+    "transfers": "Bank / branch in / branch out",
+    "transfers_bank": "Bank deposit",
+    "day_closed": "Day closed",
+    "closing_formula": "Opening + Collections − Disbursements + Income − Expense − Petty − Transfers",
+    "closing_calculated": "Calculated (day open)",
+    "opening_help": "One cash total for the shop — set at the start of the day before entries.",
+    "entry_help": "Loan collections, closes, and disbursements appear automatically. Manual entries show who recorded them.",
+    "ledger_help": "Loan activity plus manual entries for the selected date.",
+    "deposit_help": "Record when excess cash is deposited (usually the day after close if over the cash limit).",
+    "count_help": "Count every denomination in the cash box. Total must match physical cash before you close.",
+    "from_count": "From note & coin count",
+    "auto_from_count": "Auto from note & coin count",
+    "variance_physical": "Physical − book",
+    "variance_saved": "System closing − book (saved on close)"
+  },
+  "alerts": {
+    "cash_over_limit": "Cash in hand ({{cash}}) exceeds the shop limit ({{limit}}). Deposit {{excess}} to the bank when possible.",
+    "recommended_deposit": "Recommended bank deposit: {{amount}}"
+  },
+  "buttons": {
+    "save_opening": "Save opening",
+    "save_entry": "Save entry",
+    "record_deposit": "Record bank deposit",
+    "close_day": "Close day",
+    "record_transfer": "Record transfer"
+  },
+  "sections": {
+    "set_opening": "Set opening balance",
+    "add_entry": "Add entry",
+    "daily_ledger": "Daily ledger",
+    "deposit_to_bank": "Deposit cash to bank",
+    "close_count": "Close day — note & coin count",
+    "deposits_today": "Bank deposits today",
+    "day_summary": "Day summary",
+    "inter_branch": "Inter-branch transfer"
+  },
+  "ledger": {
+    "sl_no": "Sl. no",
+    "date_time": "Date & time",
+    "type": "Type",
+    "description": "Description",
+    "recorded_by": "Recorded by",
+    "direction": "Direction",
+    "amount": "Amount",
+    "empty": "No transactions for this date."
+  },
+  "deposits": {
+    "date": "Date",
+    "bank": "Bank",
+    "reference": "Reference",
+    "amount": "Amount"
+  },
+  "summary": {
+    "disbursements": "Disbursements",
+    "bank_deposits": "Bank deposits (cash out)",
+    "transfers_in": "Transfers in",
+    "transfers_out": "Transfers out",
+    "petty_cash": "Petty cash",
+    "cash_limit": "Cash limit"
+  },
+  "transfers": {
+    "date": "Date",
+    "from": "From",
+    "to": "To",
+    "amount": "Amount",
+    "dir": "Dir"
+  }
+}

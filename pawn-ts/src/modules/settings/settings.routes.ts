@@ -38,9 +38,20 @@ const organizationSchema = z.object({
   modules: modulesSchema.optional(),
 });
 
+// ~1.5 MB of base64 data URL — comfortably fits a small shop logo.
+const MAX_LOGO_LENGTH = 1_500_000;
+const logoSchema = z
+  .string()
+  .max(MAX_LOGO_LENGTH)
+  .refine((v) => v === '' || /^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,/.test(v), {
+    message: 'Logo must be a base64-encoded image',
+  })
+  .optional();
+
 const profileSchema = z.object({
   companyName: z.string().min(1).max(100),
   proprietor: z.string().max(100).optional(),
+  logoUrl: logoSchema,
 });
 
 const preferencesSchema = z.object({
@@ -56,6 +67,9 @@ const preferencesSchema = z.object({
     .min(MIN_SESSION_TIMEOUT_MINUTES)
     .max(MAX_SESSION_TIMEOUT_MINUTES)
     .optional(),
+  qrCodesEnabled: z.boolean().optional(),
+  cashLimit: z.number().nonnegative().optional(),
+  receiptLanguage: z.enum(['en', 'ta']).optional(),
   modules: modulesSchema.optional(),
 });
 

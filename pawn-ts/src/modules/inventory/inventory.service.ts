@@ -46,8 +46,6 @@ function serializeStockRow(row: {
     netWeight: Prisma.Decimal;
     id: bigint;
     inventoryMeta?: {
-      barcode: string | null;
-      qrCode: string | null;
       location: string | null;
       lockerNo: string | null;
       photoUrl: string | null;
@@ -56,6 +54,7 @@ function serializeStockRow(row: {
   }>;
   bankDeposits: { isBankSettled: boolean }[];
   auctionNotice: { status: string } | null;
+  qrCode?: string | null;
 }) {
   const status = deriveStockStatus(row);
   const totalWeight = dec(row.netWeightGold) + dec(row.netWeightSilver);
@@ -63,6 +62,7 @@ function serializeStockRow(row: {
     loanId: Number(row.id),
     invoiceNo: Number(row.invoiceNo),
     status,
+    qrCode: row.qrCode ?? null,
     customerName: row.customer.name,
     customerId: Number(row.customer.customerId),
     mobileNo: row.customer.mobileNo,
@@ -82,8 +82,6 @@ function serializeStockRow(row: {
       purity: i.purity.nameEng,
       noOfItems: i.noOfItems,
       netWeight: dec(i.netWeight),
-      barcode: i.inventoryMeta?.barcode ?? null,
-      qrCode: i.inventoryMeta?.qrCode ?? null,
       location: i.inventoryMeta?.location ?? null,
       lockerNo: i.inventoryMeta?.lockerNo ?? null,
       photoUrl: i.inventoryMeta?.photoUrl ?? null,
@@ -178,14 +176,11 @@ export async function searchStock(params: {
         {
           items: {
             some: {
-              OR: [
-                { inventoryMeta: { barcode: { contains: q, mode: 'insensitive' } } },
-                { inventoryMeta: { qrCode: { contains: q, mode: 'insensitive' } } },
-                { inventoryMeta: { lockerNo: { contains: q, mode: 'insensitive' } } },
-              ],
+              inventoryMeta: { lockerNo: { contains: q, mode: 'insensitive' } },
             },
           },
         },
+        { qrCode: { contains: q, mode: 'insensitive' } },
       ];
     }
   }
@@ -288,6 +283,7 @@ export async function getLoanInventoryDetail(loanId: number, branchId: number) {
   return {
     loanId,
     invoiceNo: Number(loan.invoiceNo),
+    qrCode: loan.qrCode ?? null,
     settlementStatus: loan.isSettled,
     status: deriveStockStatus(loan),
     items: loan.items.map((i) => ({
@@ -297,8 +293,6 @@ export async function getLoanInventoryDetail(loanId: number, branchId: number) {
       purity: i.purity.nameEng,
       noOfItems: i.noOfItems,
       netWeight: dec(i.netWeight),
-      barcode: i.inventoryMeta?.barcode ?? null,
-      qrCode: i.inventoryMeta?.qrCode ?? null,
       location: i.inventoryMeta?.location ?? null,
       lockerNo: i.inventoryMeta?.lockerNo ?? null,
       photoUrl: i.inventoryMeta?.photoUrl ?? null,
@@ -312,8 +306,6 @@ export async function updateItemMeta(
   loanItemId: number,
   branchId: number,
   input: {
-    barcode?: string;
-    qrCode?: string;
     location?: string;
     lockerNo?: string;
     photoUrl?: string;
@@ -332,8 +324,6 @@ export async function updateItemMeta(
     where: { loanItemId: item.id },
     create: {
       loanItemId: item.id,
-      barcode: input.barcode,
-      qrCode: input.qrCode,
       location: input.location,
       lockerNo: input.lockerNo,
       photoUrl: input.photoUrl,
@@ -341,8 +331,6 @@ export async function updateItemMeta(
       notes: input.notes ?? '',
     },
     update: {
-      ...(input.barcode !== undefined ? { barcode: input.barcode } : {}),
-      ...(input.qrCode !== undefined ? { qrCode: input.qrCode } : {}),
       ...(input.location !== undefined ? { location: input.location } : {}),
       ...(input.lockerNo !== undefined ? { lockerNo: input.lockerNo } : {}),
       ...(input.photoUrl !== undefined ? { photoUrl: input.photoUrl } : {}),
@@ -353,8 +341,6 @@ export async function updateItemMeta(
 
   return {
     loanItemId: Number(meta.loanItemId),
-    barcode: meta.barcode,
-    qrCode: meta.qrCode,
     location: meta.location,
     lockerNo: meta.lockerNo,
     photoUrl: meta.photoUrl,
@@ -363,30 +349,26 @@ export async function updateItemMeta(
   };
 }
 
-export async function searchByBarcode(barcode: string, branchId: number) {
-  const meta = await prisma.inventoryMeta.findFirst({
+export async function searchByQrCode(code: string, branchId: number) {
+  const trimmed = code.trim();
+  const receiptMatch = /Receipt:\s*(\d+)/i.exec(trimmed);
+  const receiptNo = receiptMatch ? Number(receiptMatch[1]) : NaN;
+
+  const loan = await prisma.loan.findFirst({
     where: {
+      branchId,
       OR: [
-        { barcode: { equals: barcode, mode: 'insensitive' } },
-        { qrCode: { equals: barcode, mode: 'insensitive' } },
+        { qrCode: { equals: trimmed, mode: 'insensitive' } },
+        ...(Number.isInteger(receiptNo) && receiptNo > 0 ? [{ invoiceNo: BigInt(receiptNo) }] : []),
       ],
-      loanItem: { loan: { branchId } },
     },
-    include: {
-      loanItem: {
-        include: {
-          loan: {
-            include: stockInclude,
-          },
-        },
-      },
-    },
+    include: stockInclude,
   });
 
-  if (!meta) {
-    return { found: false, message: 'No item found for this barcode/QR' };
+  if (!loan) {
+    return { found: false, message: 'No receipt found for this QR code' };
   }
 
-  const row = serializeStockRow(meta.loanItem.loan);
-  return { found: true, ...row, matchedBarcode: meta.barcode, matchedQr: meta.qrCode };
+  const row = serializeStockRow(loan);
+  return { found: true, ...row, matchedQr: loan.qrCode };
 }

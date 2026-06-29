@@ -42,8 +42,11 @@
     },
     "status_active": "Active",
     "status_inactive": "Inactive",
+    "confirm_delete_title": "Deactivate branch?",
+    "confirm_delete_message": "Branch \"{{name}}\" ({{code}}) will be marked inactive and hidden from daily use. All branch data is kept in the database. You can review inactive branches in this list.",
     "errors": {
-      "required": "Code and name are required"
+      "required": "Code and name are required",
+      "forbidden": "Only super administrators can manage branches."
     }
   },
   "actions": {
@@ -115,6 +118,10 @@
     "partial_payments": "Partial payments",
     "released_loans": "Released loans (today)",
     "bank_balance": "Bank balance",
+    "bank_repledge_balance": "Bank re-pledge",
+    "cash_limit": "Cash limit",
+    "deposit_to_bank": "Deposit excess to bank",
+    "within_limit": "Within limit",
     "bank_pledged_stock": "Bank pledged",
     "auction_stock": "Auction stock",
     "released_stock": "Released",

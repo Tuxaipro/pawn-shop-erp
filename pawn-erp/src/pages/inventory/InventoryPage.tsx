@@ -3,7 +3,9 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import { inventoryApi, type StockSearchItem } from '../../api/modules';
+import { LoanItemQr } from '../../components/LoanItemQr';
 import { useBranch } from '../../context/BranchContext';
+import { useModuleSettings } from '../../context/ModuleSettingsContext';
 import { formatDateIN } from '../../lib/formatDate';
 import { formatMoneyIN, formatWeight } from '../../lib/formatNumber';
 import { PageHeader } from '../../components/PageHeader';
@@ -23,14 +25,14 @@ function statusVariant(status: string): 'open' | 'closed' | 'renewed' {
 }
 
 export function InventoryPage() {
-  const { t } = useTranslation('inventory');
+  const { t } = useTranslation(['inventory', 'common']);
   const { branchId } = useBranch();
+  const { qrCodesEnabled } = useModuleSettings();
   const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
 
   const [invoiceNo, setInvoiceNo] = useState('');
   const [search, setSearch] = useState('');
-  const [barcode, setBarcode] = useState('');
   const [status, setStatus] = useState(searchParams.get('commodityType') ? '' : (searchParams.get('status') ?? ''));
   const [commodityType, setCommodityType] = useState(searchParams.get('commodityType') ?? '');
   const [minWeight, setMinWeight] = useState('');
@@ -40,13 +42,23 @@ export function InventoryPage() {
   const [manageLoanId, setManageLoanId] = useState<number | null>(null);
   const [metaForm, setMetaForm] = useState({
     itemId: 0,
-    barcode: '',
-    qrCode: '',
+    itemLabel: '',
+    netWeight: 0,
     location: '',
     lockerNo: '',
     itemStatus: '',
     notes: '',
   });
+
+  const emptyMetaForm = {
+    itemId: 0,
+    itemLabel: '',
+    netWeight: 0,
+    location: '',
+    lockerNo: '',
+    itemStatus: '',
+    notes: '',
+  };
 
   useEffect(() => {
     if (searchParams.get('commodityType')) {
@@ -63,8 +75,6 @@ export function InventoryPage() {
   const saveMeta = useMutation({
     mutationFn: () =>
       inventoryApi.updateItemMeta(metaForm.itemId, branchId, {
-        barcode: metaForm.barcode || undefined,
-        qrCode: metaForm.qrCode || undefined,
         location: metaForm.location || undefined,
         lockerNo: metaForm.lockerNo || undefined,
         itemStatus: metaForm.itemStatus || undefined,
@@ -72,6 +82,7 @@ export function InventoryPage() {
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['inventory'] });
+      setMetaForm(emptyMetaForm);
     },
   });
 
@@ -95,27 +106,28 @@ export function InventoryPage() {
     e.preventDefault();
     setPage(1);
     setSubmitted(true);
-    if (barcode.trim()) {
-      void inventoryApi.barcode(barcode.trim(), branchId).then(() => refetch());
-    } else {
-      void refetch();
-    }
+    void refetch();
   }
 
   function openManage(loanId: number) {
     setManageLoanId(loanId);
+    setMetaForm(emptyMetaForm);
   }
 
   function startEditItem(item: Record<string, unknown>) {
     setMetaForm({
       itemId: Number(item.id),
-      barcode: String(item.barcode ?? ''),
-      qrCode: String(item.qrCode ?? ''),
+      itemLabel: `${String(item.subCategory)} — ${String(item.item)}`,
+      netWeight: Number(item.netWeight),
       location: String(item.location ?? ''),
       lockerNo: String(item.lockerNo ?? ''),
       itemStatus: String(item.itemStatus ?? ''),
       notes: String(item.notes ?? ''),
     });
+  }
+
+  function cancelEdit() {
+    setMetaForm(emptyMetaForm);
   }
 
   const counts = data?.statusCounts ?? {};
@@ -130,10 +142,7 @@ export function InventoryPage() {
             <Input value={invoiceNo} onChange={(e) => setInvoiceNo(e.target.value)} placeholder="1001" />
           </Field>
           <Field label={t('search.customer')}>
-            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('search.barcode_hint')} />
-          </Field>
-          <Field label={t('search.barcode')}>
-            <Input value={barcode} onChange={(e) => setBarcode(e.target.value)} placeholder="BC-001" />
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('search.customer_hint')} />
           </Field>
           <Field label={t('search.status')}>
             <Select value={status} onChange={(e) => setStatus(e.target.value)}>
@@ -244,14 +253,18 @@ export function InventoryPage() {
 
       {manageLoanId != null && detail != null && (
         <Card className="mt-6">
-          <CardTitle>{t('detail.items')} — #{(detail as { invoiceNo: number }).invoiceNo}</CardTitle>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <CardTitle>{t('detail.items')} — #{(detail as { invoiceNo: number }).invoiceNo}</CardTitle>
+            {qrCodesEnabled && (detail as { qrCode?: string | null }).qrCode && (
+              <LoanItemQr value={(detail as { qrCode: string }).qrCode} size={88} />
+            )}
+          </div>
           <TableCard className="mt-4 border-0 shadow-none">
             <DataTable>
               <THead>
                 <tr>
                   <TH>Item</TH>
                   <TH>Weight</TH>
-                  <TH>Barcode</TH>
                   <TH>Locker</TH>
                   <TH>Location</TH>
                   <TH />
@@ -259,10 +272,12 @@ export function InventoryPage() {
               </THead>
               <TBody>
                 {(detail as { items: Array<Record<string, unknown>> }).items.map((item) => (
-                  <tr key={String(item.id)}>
+                  <tr
+                    key={String(item.id)}
+                    className={metaForm.itemId === Number(item.id) ? 'bg-zinc-50' : undefined}
+                  >
                     <TD>{String(item.subCategory)} — {String(item.item)}</TD>
                     <TD>{formatWeight(Number(item.netWeight))}</TD>
-                    <TD>{String(item.barcode ?? '—')}</TD>
                     <TD>{String(item.lockerNo ?? '—')}</TD>
                     <TD>{String(item.location ?? '—')}</TD>
                     <TD>
@@ -277,21 +292,43 @@ export function InventoryPage() {
           </TableCard>
 
           {metaForm.itemId > 0 && (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <Field label="Barcode"><Input value={metaForm.barcode} onChange={(e) => setMetaForm((f) => ({ ...f, barcode: e.target.value }))} /></Field>
-              <Field label="QR code"><Input value={metaForm.qrCode} onChange={(e) => setMetaForm((f) => ({ ...f, qrCode: e.target.value }))} /></Field>
-              <Field label="Locker"><Input value={metaForm.lockerNo} onChange={(e) => setMetaForm((f) => ({ ...f, lockerNo: e.target.value }))} /></Field>
-              <Field label="Location"><Input value={metaForm.location} onChange={(e) => setMetaForm((f) => ({ ...f, location: e.target.value }))} /></Field>
-              <Field label="Status">
-                <Select value={metaForm.itemStatus} onChange={(e) => setMetaForm((f) => ({ ...f, itemStatus: e.target.value }))}>
-                  <option value="">—</option>
-                  <option value="lost">Lost</option>
-                  <option value="damaged">Damaged</option>
-                  <option value="transferred">Transferred</option>
-                </Select>
-              </Field>
-              <Field label="Notes"><Input value={metaForm.notes} onChange={(e) => setMetaForm((f) => ({ ...f, notes: e.target.value }))} /></Field>
-              <Button type="button" onClick={() => saveMeta.mutate()} disabled={saveMeta.isPending}>Save meta</Button>
+            <div className="mt-4 rounded-lg border border-zinc-200/80 bg-zinc-50/80 p-4">
+              <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t('detail.editing')}</p>
+                  <p className="mt-1 text-sm font-semibold text-zinc-950">{metaForm.itemLabel}</p>
+                </div>
+                <p className="text-sm text-zinc-600">
+                  {t('detail.weight')}: <span className="font-medium text-zinc-950">{formatWeight(metaForm.netWeight)}</span>
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <Field label={t('detail.locker')}>
+                  <Input value={metaForm.lockerNo} onChange={(e) => setMetaForm((f) => ({ ...f, lockerNo: e.target.value }))} />
+                </Field>
+                <Field label={t('detail.location')}>
+                  <Input value={metaForm.location} onChange={(e) => setMetaForm((f) => ({ ...f, location: e.target.value }))} />
+                </Field>
+                <Field label={t('detail.status')}>
+                  <Select value={metaForm.itemStatus} onChange={(e) => setMetaForm((f) => ({ ...f, itemStatus: e.target.value }))}>
+                    <option value="">—</option>
+                    <option value="lost">{t('status.lost')}</option>
+                    <option value="damaged">{t('status.damaged')}</option>
+                    <option value="transferred">{t('status.transferred')}</option>
+                  </Select>
+                </Field>
+                <Field label={t('detail.notes')} className="sm:col-span-2 lg:col-span-3">
+                  <Input value={metaForm.notes} onChange={(e) => setMetaForm((f) => ({ ...f, notes: e.target.value }))} />
+                </Field>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button type="button" onClick={() => saveMeta.mutate()} disabled={saveMeta.isPending}>
+                  {saveMeta.isPending ? t('common:loading') : t('detail.save_meta')}
+                </Button>
+                <Button type="button" variant="secondary" onClick={cancelEdit} disabled={saveMeta.isPending}>
+                  {t('common:actions.cancel')}
+                </Button>
+              </div>
             </div>
           )}
         </Card>

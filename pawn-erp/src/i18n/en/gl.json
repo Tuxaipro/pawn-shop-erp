@@ -1,0 +1,10 @@
+{
+  "title": "General Ledger",
+  "subtitle": "General ledger, journal & sub-ledgers",
+  "tabs": {
+    "trial": "Trial balance",
+    "accounts": "Chart of accounts",
+    "journal": "Journal",
+    "sub_ledger": "Sub-ledger"
+  }
+}

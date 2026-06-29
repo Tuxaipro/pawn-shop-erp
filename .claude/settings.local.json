@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma *)",
+      "Bash(echo \"exit:$?\")",
+      "Read(//f/f/Projects/Pawn-ERP/pawn-erp/src/i18n/**)",
+      "Bash(node /tmp/i18n-check.mjs)",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('en/help.json'\\)\\); JSON.parse\\(require\\('fs'\\).readFileSync\\('ta/help.json'\\)\\); console.log\\('help JSON valid'\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(cd /f/Projects/Pawn-ERP/pawn-erp && grep -n \"loansApi\\\\.\\\\|getLoan\\\\|api\\\\.get\\\\|useQuery\\\\|Loan\\\\b\\\\|: Loan\" src/pages/renewals/RenewalRecordPage.tsx src/pages/part-payments/PartPaymentRecordPage.tsx src/pages/bank-loans/BankLoanRecordPage.tsx src/components/loans/LoanRecordSummary.tsx | grep -i \"loan\\\\|query\\\\|api\" | head -40)"
+    ]
+  }
+}

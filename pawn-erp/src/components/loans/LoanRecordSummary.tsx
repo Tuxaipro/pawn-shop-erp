@@ -4,6 +4,7 @@ import type { LoanDetail } from '../../api/loans';
 import { formatAmountInWords } from '../../lib/amountInWords';
 import { formatLoanConditionText } from '../../lib/loanConditionText';
 import { formatDateIN } from '../../lib/formatDate';
+import { localizedCommodity, localizedItemNames } from '../../lib/localizedItem';
 import { Badge } from '../ui/Badge';
 import { Card, CardTitle } from '../ui/Card';
 import { DataTable, TableCard, TBody, TD, TH, THead } from '../ui/Table';
@@ -14,9 +15,11 @@ function formatMoney(value: number) {
 
 export type SettlementRow = {
   label: string;
-  value: number;
+  value: number | string;
   emphasize?: 'semibold' | 'due';
   borderTop?: boolean;
+  /** Render the value as-is (e.g. a month count) instead of money. */
+  raw?: boolean;
 };
 
 type Props = {
@@ -36,14 +39,14 @@ export function LoanRecordSummary({
   showPartPayments = false,
   extraBadges,
 }: Props) {
-  const { t: tLoan } = useTranslation('loan');
+  const { t: tLoan, i18n } = useTranslation('loan');
   const conditionText = formatLoanConditionText(loan, tLoan);
   const showGoldNet = loan.commodityTypeCode === 'gold' && loan.netWeightGold > 0;
   const showSilverNet = loan.commodityTypeCode === 'silver' && loan.netWeightSilver > 0;
 
   return (
     <>
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+      <div className="mt-6 mb-6 flex flex-wrap items-center gap-3">
         <h2 className="text-lg font-semibold text-zinc-950">
           {tLoan('columns.receipt')}
           <span className="ml-3">#{loan.invoiceNo}</span>
@@ -76,7 +79,9 @@ export function LoanRecordSummary({
             </div>
             <div className="flex justify-between gap-4">
               <dt className="shrink-0 text-zinc-500">{tLoan('fields.commodity')}</dt>
-              <dd className="text-right font-medium">{loan.commodityTypeLabel}</dd>
+              <dd className="text-right font-medium">
+                {localizedCommodity(loan.commodityTypeCode, loan.commodityTypeLabel, i18n.language)}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="shrink-0 text-zinc-500">{tLoan('fields.customer_type')}</dt>
@@ -132,15 +137,15 @@ export function LoanRecordSummary({
               {settlementRows.map((row) => (
                 <div
                   key={row.label}
-                  className={`flex justify-between gap-4${row.borderTop ? ' border-t border-zinc-100 pt-2' : ''}`}
+                  className={`flex items-baseline justify-between gap-3${row.borderTop ? ' border-t border-zinc-100 pt-2' : ''}`}
                 >
                   <dt
-                    className={`shrink-0 text-zinc-500${row.emphasize === 'due' ? ' font-medium text-zinc-700' : ''}`}
+                    className={`min-w-0 text-zinc-500${row.emphasize === 'due' ? ' font-medium text-zinc-700' : ''}`}
                   >
                     {row.label}
                   </dt>
                   <dd
-                    className={`text-right${
+                    className={`shrink-0 whitespace-nowrap text-right${
                       row.emphasize === 'due'
                         ? ' text-lg font-semibold text-emerald-700'
                         : row.emphasize === 'semibold'
@@ -148,7 +153,7 @@ export function LoanRecordSummary({
                           : ' font-medium'
                     }`}
                   >
-                    {formatMoney(row.value)}
+                    {row.raw ? row.value : formatMoney(Number(row.value))}
                   </dd>
                 </div>
               ))}
@@ -204,20 +209,23 @@ export function LoanRecordSummary({
               </tr>
             </THead>
             <TBody>
-              {loan.items.map((item, index) => (
-                <tr key={item.id}>
-                  <TD>{index + 1}</TD>
-                  <TD>{item.subCategoryName}</TD>
-                  <TD>{item.itemName}</TD>
-                  <TD>
-                    {loan.commodityTypeCode === 'silver'
-                      ? tLoan('collateral.purity_na')
-                      : item.purityName}
-                  </TD>
-                  <TD>{item.noOfItems}</TD>
-                  <TD>{item.netWeight}</TD>
-                </tr>
-              ))}
+              {loan.items.map((item, index) => {
+                const names = localizedItemNames(item, i18n.language);
+                return (
+                  <tr key={item.id}>
+                    <TD>{index + 1}</TD>
+                    <TD>{names.subCategory}</TD>
+                    <TD>{names.item}</TD>
+                    <TD>
+                      {loan.commodityTypeCode === 'silver'
+                        ? tLoan('collateral.purity_na')
+                        : names.purity}
+                    </TD>
+                    <TD>{item.noOfItems}</TD>
+                    <TD>{item.netWeight}</TD>
+                  </tr>
+                );
+              })}
             </TBody>
           </DataTable>
           {conditionText && (

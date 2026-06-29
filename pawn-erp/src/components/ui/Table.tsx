@@ -44,9 +44,17 @@ export function TBody({ children }: { children: React.ReactNode }) {
   return <tbody className="divide-y divide-zinc-950/5">{children}</tbody>;
 }
 
-export function TD({ children, className }: { children: React.ReactNode; className?: string }) {
+export function TD({
+  children,
+  className,
+  colSpan,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  colSpan?: number;
+}) {
   return (
-    <td className={cn('px-4 py-4 text-zinc-700 first:pl-6 last:pr-6 sm:px-6', className)}>
+    <td colSpan={colSpan} className={cn('px-4 py-4 text-zinc-700 first:pl-6 last:pr-6 sm:px-6', className)}>
       {children}
     </td>
   );

@@ -1,6 +1,6 @@
 {
-  "panel_title": "Help & Support",
-  "support_menu": "Support",
+  "panel_title": "Help",
+  "support_menu": "Help",
   "help_button": "Help",
   "close": "Close",
   "tab_this_page": "This page",
@@ -18,18 +18,27 @@
   "pages": {
     "dashboard": {
       "title": "Dashboard",
-      "purpose": "Your daily command centre — open loans, renewals due, cash position, and shortcuts to common tasks.",
+      "purpose": "Your daily command centre — today's activity, cash position, stock summary, and shortcuts to common tasks.",
       "steps": [
-        "Confirm the correct branch is selected in the top toolbar.",
-        "Review KPI cards: open loans, disbursed amount, renewals due, and overdue count.",
-        "Use Quick Actions to start a new loan, record renewal, part payment, or bank batch.",
-        "Click any metric card to jump to the related list."
+        "Step 1: Confirm the correct branch is selected in the top toolbar (hidden if you have only one branch).",
+        "Step 2: Review Quick Actions — use these buttons to start a new loan, renewal, part payment, or other common tasks.",
+        "Step 3: Check Today's Operations — each card shows today's count only (not lifetime totals):",
+        "  • New customers (today) — customers registered today in this branch",
+        "  • New loans (today) — loans with today's loan date",
+        "  • Interest collected (today) — part payments + interest on closes today (not full redemption cash)",
+        "  • Partial payments — number of part payments recorded today",
+        "  • Released loans (today) — loans fully closed today (renewals are not counted)",
+        "  • Expenses (today) — daily book expense + petty cash entries for today",
+        "Step 4: Review Financial Snapshot — cash in hand, opening balance, collections, and monthly profit.",
+        "Step 5: Check Inventory & Gold Stock — weights show grams with 2 decimal places.",
+        "Step 6: Click any card or alert to jump to the related screen."
       ],
       "example_title": "Morning shop review",
-      "example": "At opening, check Renewals Due and Overdue counts. If 15 loans are due today, open Renewals from Quick Actions and process them before new pawns.",
+      "example": "At opening: Today's Operations shows 2 new loans and ₹625 interest collected. Renewals Due shows 5 loans — open Renewals from Quick Actions before taking new pawns.",
       "tips": [
-        "Figures are branch-specific — switch branch before comparing totals.",
-        "Charts may take a moment to load with large historical data."
+        "All figures are for the selected branch and today's business date.",
+        "Interest collected does not include principal when a customer redeems a loan.",
+        "Expenses include petty cash recorded under Daily book → Petty cash."
       ]
     },
     "customers-list": {
@@ -107,33 +116,42 @@
       "title": "New Pawn Loan",
       "purpose": "Create a pawn against pledged gold or silver items and print a receipt.",
       "steps": [
-        "Search and select the customer.",
-        "Enter a new receipt (invoice) number — must not already exist in this branch.",
-        "Choose commodity (Gold/Silver), loan condition, and customer type.",
-        "Add collateral: sub-category, item type, purity, count, and net weight per line.",
-        "Enter loan amount — amount in words fills automatically.",
-        "Confirm interest rate and renewal date, then save and print."
+        "Step 1: Search and select the customer (or create a new customer first).",
+        "Step 2: Enter a new receipt number — must not already exist in this branch.",
+        "Step 3: Set loan date, commodity (Gold/Silver), loan condition, and customer type.",
+        "Step 4: Add each collateral item: sub-category, item type, purity, quantity, and net weight (grams).",
+        "Step 5: Enter loan amount — amount in words fills automatically.",
+        "Step 6: Confirm interest rate and renewal date, then click Save.",
+        "Step 7: Open the loan detail page and print the receipt.",
+        "Step 8: If QR codes are enabled (Settings → Application), one QR code is created automatically for this receipt."
       ],
       "example_title": "Gold chain pawn",
       "example": "Customer #4242 pledges one gold chain (செயின்), 8.500 g, KDM 916, loan ₹23,000, receipt #92289, renewal 12 months from today.",
       "tips": [
         "Interest % comes from Masters → Interest declarations for the amount slab.",
-        "Add multiple collateral lines for items pledged together on one receipt."
+        "Add multiple collateral lines for items pledged together on one receipt.",
+        "QR code (when enabled) shows customer name, ID, mobile, and receipt number — one per receipt, not per item."
       ]
     },
     "loans-detail": {
       "title": "Loan Detail",
-      "purpose": "Full view of one pawn: customer, collateral, payments, renewal chain, and bank status.",
+      "purpose": "Full view of one pawn: customer, collateral, payments, renewal chain, bank status, and receipt QR code.",
       "steps": [
-        "Verify receipt number, loan amount, and renewal date with the customer.",
-        "Review collateral lines and weights against physical items.",
-        "Use actions: Edit (open loans), Close, Print, Part payment, Renewal, or Bank deposit."
+        "Step 1: Check the receipt header — receipt number, customer name, and status badge.",
+        "Step 2: If QR codes are enabled, one QR appears next to the receipt title. Scanning shows: customer name, customer ID, mobile, and receipt number.",
+        "Step 3: Review the Loan card — date, amount, interest, commodity, and net weight.",
+        "Step 4: Review the Customer card — name, ID, mobile, and address.",
+        "Step 5: Check Interest (as of today) for amount due if the loan is still open.",
+        "Step 6: Review the Collateral Items table — verify each pledged item and weight.",
+        "Step 7: Use the action icons (top right): Print, Renew, Close, or Part payment as needed."
       ],
-      "example_title": "Closed historical loan",
-      "example": "Receipt #1014788 — ₹25,000 gold loan from Oct 2018, settled Oct 2019 — use this page for audit or receipt reprint only; Edit is not available on closed loans.",
+      "example_title": "Open loan with QR",
+      "example": "Receipt #50002 — QR next to the title shows customer நாகலட்சுமி, ID 1001, mobile 9751843753, receipt 50002. Staff can scan the QR to verify identity at the counter.",
       "tips": [
+        "One QR code per receipt — not one per collateral line.",
         "Part-payment history appears on this page.",
-        "Bank deposit badge shows if the loan is pledged with a bank."
+        "Bank deposit badge shows if the loan is pledged with a bank.",
+        "Edit is only available for open loans with no active bank deposit."
       ]
     },
     "loans-edit": {
@@ -169,17 +187,20 @@
     },
     "loans-print": {
       "title": "Print Receipt",
-      "purpose": "Print-friendly pawn receipt for the customer or shop copy.",
+      "purpose": "Print-friendly pawn receipt for the customer or shop copy, including QR code when enabled.",
       "steps": [
-        "Open from loan detail → Print, or use the print route directly.",
-        "Use browser Print (Ctrl+P) — layout hides sidebar and menus.",
-        "Check branch name and address appear correctly before handing to customer."
+        "Step 1: Open from loan detail → Print icon, or go to /loans/:id/print.",
+        "Step 2: Review customer copy and company copy on screen.",
+        "Step 3: If QR codes are enabled, one QR appears in the receipt header (top right) — not on each item line.",
+        "Step 4: Press Ctrl+P (or the Print button) and choose your printer.",
+        "Step 5: Hand the customer copy to the customer; keep the company copy in your files."
       ],
       "example_title": "Customer copy at pledge",
-      "example": "After saving new loan #92289, print two copies — one for customer, one for shop file — with receipt number, weights, and renewal date clearly visible.",
+      "example": "After saving new loan #92289, print two copies — customer copy with QR for easy lookup, shop copy for the file. QR encodes name, ID, mobile, and receipt #92289.",
       "tips": [
         "Update branch address under Settings → Branches if receipts show old details.",
-        "Tamil item names come from Master Data sub-items."
+        "Tamil item names come from Master Data sub-items.",
+        "Enable QR codes under Settings → Application → Loan item QR codes."
       ]
     },
     "part-payments-list": {
@@ -304,33 +325,48 @@
       ]
     },
     "inventory": {
-      "title": "Inventory",
-      "purpose": "Retail items held for sale (e.g. silver articles from auctions or purchases).",
+      "title": "Inventory / Stock Check",
+      "purpose": "Search pledged collateral by receipt, customer, weight, and status. Assign locker and location for vault items.",
       "steps": [
-        "Add items with description, weight, and sale price.",
-        "Update status when sold.",
-        "Use reports for stock on hand."
+        "Step 1: Enter search criteria — receipt number, customer name/phone/ID, status, commodity, or weight range.",
+        "Step 2: Click Search. Status summary chips show counts: Available, Bank pledged, Released, etc.",
+        "Step 3: Click a status chip to filter, or browse the results table.",
+        "Step 4: Click Manage on a row to open that receipt's item list.",
+        "Step 5: In the manage panel, see all collateral lines. If QR is enabled, one QR for the whole receipt appears at the top.",
+        "Step 6: Click Edit on an item to set locker number, location, status (lost/damaged/transferred), or notes.",
+        "Step 7: The edit form shows which item you are editing (name and weight). Click Save or Cancel when done."
       ],
-      "example_title": "Silver article for sale",
-      "example": "After auction, unsold silver bangle weighed 45 g — add to inventory at ₹3,200, mark sold when customer buys over counter.",
+      "example_title": "Find a pledged chain",
+      "example": "Customer says receipt #50002 — search 50002, click Manage, confirm Fancy Earring 2.00 g and other lines match vault tags. Set Locker A-12 and Location Vault-1 for each item.",
       "tips": [
-        "Distinct from live pawn collateral on open loans.",
-        "Link to accounts when recording sale cash."
+        "This screen tracks live pawn collateral — not retail sale stock.",
+        "Weights display with 2 decimal places (e.g. 8.60 g).",
+        "QR scan is not in search — use receipt number or customer details to find loans.",
+        "QR on the manage panel is the same one QR for the entire receipt."
       ]
     },
     "accounts": {
       "title": "Daily Book & Cash",
-      "purpose": "Record daily income, expenses, and reconcile vault vs counter cash.",
+      "purpose": "Single shop cash register — daily income/expense, note counts at day close, and bank deposits when over limit.",
       "steps": [
-        "Open today's book or select a date.",
-        "Add income and expense entries with category and amount.",
-        "Enter physical cash count and compare to system balance."
+        "Step 1: Open Accounts → Daily book tab for entries and the auto ledger.",
+        "Step 2: Select today's date (or the date you are closing).",
+        "Step 3: Review summary cards — Opening, Cash in hand, Collections, Closing.",
+        "Step 4: Add manual entries: Income, Expense, Petty cash, or Top-up (cash added to the drawer) with amount and who recorded it.",
+        "Step 5: Open Day close tab when ready to end the day.",
+        "Step 6: Count each note and coin (₹2000 down to ₹1) — physical total is calculated automatically.",
+        "Step 7: Confirm Closing balance (Current) matches your count, then click Close day — the button sits next to the Notes box.",
+        "Step 8: If cash exceeds the shop limit (Settings → Application), deposit excess to bank the next day using Deposit cash to bank."
       ],
-      "example_title": "End-of-day cash",
-      "example": "Counter cash ₹85,400, vault ₹12,00,000 — record shop expenses ₹2,500 (tea, courier), confirm closing balance matches physical count.",
+      "example_title": "End-of-day close",
+      "example": "Physical count: 50×₹2000 + 100×₹500 = ₹1,50,000. Closing balance (Current) ₹1,49,875 — variance ₹125 noted. Limit ₹5,00,000 — no bank deposit needed. If count were ₹6,20,000, deposit ₹1,20,000 to TMB next morning.",
       "tips": [
-        "Loan disbursements and settlements also flow through loan modules.",
-        "Investigate variance before closing the day."
+        "There is only one cash total — no vault/counter split.",
+        "Closing balance (Current) is your counted cash — it carries forward as the next day's opening balance.",
+        "Top-up adds cash to the drawer (e.g. an owner cash injection) and counts as cash in, like income.",
+        "Loan collections and closes appear in the ledger automatically.",
+        "Bank deposit here is shop cash to your bank account — not loan re-pledge.",
+        "Set cash limit under Settings → Application preferences (Super Admin)."
       ]
     },
     "investments": {
@@ -401,15 +437,20 @@
     },
     "settings-organization": {
       "title": "Organization Profile",
-      "purpose": "Shop name, proprietor, and details printed on receipts.",
+      "purpose": "Shop name, proprietor, company logo, and details printed on receipts.",
       "steps": [
+        "Upload a company logo (PNG, JPG, or SVG up to 1 MB) — or change/remove an existing one.",
         "Update company name and proprietor line.",
-        "Save — appears on new printouts.",
+        "Save — the logo and details appear on new printouts.",
         "Coordinate with Branches for per-location address."
       ],
       "example_title": "Receipt header",
-      "example": "Kabilan Pawn Shop, Prop.: M. Kabilan, M.E., — shown at top of every pawn receipt printed from the system.",
-      "tips": ["Super Admin only.", "Changes do not reprint old receipts automatically."]
+      "example": "Ganesan Pawn Shop, Prop.: S. Ganesan, B.A., — shown at top of every pawn receipt printed from the system. When a logo is set, it also appears in the top-left of the sidebar in place of the default badge.",
+      "tips": [
+        "Super Admin only.",
+        "Once a logo is uploaded it shows in the sidebar before the app name.",
+        "Changes do not reprint old receipts automatically."
+      ]
     },
     "settings-branches": {
       "title": "Branches",
@@ -420,20 +461,32 @@
         "Each branch has separate receipt number sequences."
       ],
       "example_title": "Main branch contact",
-      "example": "Main — Nadar New Street Usilampatti, landline 04552-250369, mobile 94867-12212 — appears on printed receipts and SMS.",
+      "example": "Main — 12 Bazaar Street, Your Town, landline 0XXXX-XXXXXX, mobile 9XXXXXXXXX — appears on printed receipts and SMS.",
       "tips": ["Use branch selector in toolbar when working multi-branch.", "Inactive branches hidden from selectors."]
     },
     "settings-preferences": {
       "title": "Application Preferences",
-      "purpose": "Enable optional modules, session timeout, and application defaults.",
+      "purpose": "Set receipt print language, cash limit, QR codes, session timeout, dashboard refresh, and optional modules.",
       "steps": [
-        "Toggle Bank Loans, Auctions, Investments, GL, Notifications.",
-        "Set session idle timeout (default 30 minutes).",
-        "Save — sidebar updates immediately."
+        "Step 1: Open Settings → Application (Super Admin only).",
+        "Step 2: Set Dashboard auto-refresh interval (minimum 30 seconds).",
+        "Step 3: Set Session timeout — users are logged out after this many minutes of inactivity.",
+        "Step 4: Set the cash limit used to flag excess cash at day close.",
+        "Step 5: Choose the Receipt print language (Tamil or English) — loan receipts print in this language no matter which language is shown on screen.",
+        "Step 6: Toggle Loan item QR codes — when ON, each receipt gets one QR showing customer name, ID, mobile, and receipt number.",
+        "Step 7: Enable optional modules — shown on the right: Bank Loans, Auctions, Investments, GL, Notifications.",
+        "Step 8: Click Save — sidebar and features update immediately for all users.",
+        "Step 9: When you turn QR codes ON, open loans are backfilled automatically."
       ],
-      "example_title": "Enable bank module",
-      "example": "Turn on Bank Loans — Bank Loan menu appears in sidebar, batch deposit and re-pledge screens become available.",
-      "tips": ["Disabled modules are hidden from all users.", "Super Admin only."]
+      "example_title": "Tamil receipts, English app",
+      "example": "Set Receipt print language to Tamil while staff use English on screen → loan printouts (labels, sub-category, item, purity, commodity) come out in Tamil, but the app stays in English for the user.",
+      "tips": [
+        "Receipt print language affects printed receipts only, not the on-screen app language.",
+        "Optional modules are on the right of the page; the rest of the preferences are on the left.",
+        "Disabled modules are hidden from menu and blocked by URL.",
+        "QR is one per receipt — not per collateral item.",
+        "Super Admin only."
+      ]
     },
     "settings-users": {
       "title": "System Users",
@@ -461,15 +514,21 @@
     },
     "settings-audit": {
       "title": "Audit Log",
-      "purpose": "Timestamped record of sensitive actions for compliance.",
+      "purpose": "Timestamped record of sensitive actions for compliance, shown in plain language.",
       "steps": [
-        "Filter by date or user.",
-        "Review create/update/delete on loans, settings, and security.",
+        "Filter by date range or section (e.g. loans, customers).",
+        "Read each row: Date & time (Indian format), User, Action (Created / Updated / Deleted), and the Record affected.",
+        "Open the Change details column to see which fields and values were submitted.",
         "Export for audit if required."
       ],
       "example_title": "Investigate receipt change",
-      "example": "Filter loan edits for receipt #92288 — see who changed weight and when, useful for internal dispute resolution.",
-      "tips": ["Read-only — entries cannot be deleted.", "Super Admin and managers typically have access."]
+      "example": "Filter the Loan section for record #92288 — the row reads 'Updated · Loan #92288' on 14-05-2026 10:32, and Change details shows the new weight, so you can see who changed it and when.",
+      "tips": [
+        "Date & time is shown in Indian standard format (DD-MM-YYYY HH:mm).",
+        "Action and Record are friendly labels; hover to see the raw technical value.",
+        "Read-only — entries cannot be deleted.",
+        "Super Admin and managers typically have access."
+      ]
     },
     "masters-categories": {
       "title": "Commodity Categories",

@@ -54,18 +54,18 @@ async function seedMasters(commodityMasters: CommodityMasterSeedResult) {
 
   await prisma.purity.upsert({
     where: { id: 1 },
-    update: {},
+    update: { nameTamil: 'KDM 916', nameEng: 'KDM 916' },
     create: { id: 1, nameTamil: 'KDM 916', nameEng: 'KDM 916' },
   });
   await prisma.purity.upsert({
     where: { id: 2 },
-    update: {},
-    create: { id: 2, nameTamil: 'Ordinary', nameEng: 'Ordinary' },
+    update: { nameTamil: 'சாதாரண', nameEng: 'Ordinary' },
+    create: { id: 2, nameTamil: 'சாதாரண', nameEng: 'Ordinary' },
   });
   await prisma.purity.upsert({
     where: { id: 3 },
-    update: { nameTamil: 'Hallmark', nameEng: 'Hallmark' },
-    create: { id: 3, nameTamil: 'Hallmark', nameEng: 'Hallmark' },
+    update: { nameTamil: 'ஹால்மார்க்', nameEng: 'Hallmark' },
+    create: { id: 3, nameTamil: 'ஹால்மார்க்', nameEng: 'Hallmark' },
   });
   await prisma.purity.upsert({
     where: { id: 4 },

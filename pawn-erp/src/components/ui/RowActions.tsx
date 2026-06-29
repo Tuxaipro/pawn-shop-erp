@@ -15,6 +15,7 @@ type RowActionsProps = {
   editTo?: string;
   onDelete?: () => void;
   deleteMessage?: string;
+  deleteTitle?: string;
   editLabel?: string;
   deleteLabel?: string;
   showEdit?: boolean;
@@ -26,6 +27,7 @@ export function RowActions({
   editTo,
   onDelete,
   deleteMessage,
+  deleteTitle,
   editLabel,
   deleteLabel,
   showEdit = true,
@@ -34,13 +36,13 @@ export function RowActions({
   const { t } = useTranslation('common');
   const confirm = useConfirm();
 
-  const editTitle = editLabel ?? t('actions.edit');
-  const deleteTitle = deleteLabel ?? t('actions.delete');
+  const editAriaLabel = editLabel ?? t('actions.edit');
+  const deleteAriaLabel = deleteLabel ?? t('actions.delete');
 
   const handleDelete = async () => {
     if (!onDelete) return;
     const ok = await confirm({
-      title: t('confirm.delete_title'),
+      title: deleteTitle ?? t('confirm.delete_title'),
       message: deleteMessage ?? t('confirm.delete_message'),
       confirmLabel: t('actions.delete'),
       cancelLabel: t('actions.cancel'),
@@ -52,11 +54,11 @@ export function RowActions({
     <div className="flex items-center gap-0.5">
       {showEdit &&
         (editTo ? (
-          <Link to={editTo} className={editClass} title={editTitle} aria-label={editTitle}>
+          <Link to={editTo} className={editClass} title={editAriaLabel} aria-label={editAriaLabel}>
             <EditIcon />
           </Link>
         ) : onEdit ? (
-          <button type="button" className={editClass} onClick={onEdit} title={editTitle} aria-label={editTitle}>
+          <button type="button" className={editClass} onClick={onEdit} title={editAriaLabel} aria-label={editAriaLabel}>
             <EditIcon />
           </button>
         ) : null)}
@@ -65,8 +67,8 @@ export function RowActions({
           type="button"
           className={deleteClass}
           onClick={() => void handleDelete()}
-          title={deleteTitle}
-          aria-label={deleteTitle}
+          title={deleteAriaLabel}
+          aria-label={deleteAriaLabel}
         >
           <DeleteIcon />
         </button>

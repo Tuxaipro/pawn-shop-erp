@@ -165,7 +165,7 @@ function SidebarLink({
 export function Sidebar({ collapsed, onToggle, onNavigate, className }: SidebarProps) {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
-  const { modules } = useModuleSettings();
+  const { modules, logoUrl } = useModuleSettings();
   const navModules = filterNavModules(modules, user?.role === 'SUPER_ADMIN');
 
   return (
@@ -189,9 +189,17 @@ export function Sidebar({ collapsed, onToggle, onNavigate, className }: SidebarP
           className="flex items-center gap-3 no-underline hover:no-underline"
           title="Pawn ERP"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-sm font-bold text-white">
-            P
-          </span>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt={t('app_name')}
+              className="h-8 w-8 shrink-0 rounded-lg object-contain"
+            />
+          ) : (
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-950 text-sm font-bold text-white">
+              P
+            </span>
+          )}
           {!collapsed && <span className="text-base font-semibold text-zinc-950">{t('app_name')}</span>}
         </NavLink>
       </div>

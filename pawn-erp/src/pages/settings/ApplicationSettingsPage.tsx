@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
-import { Field, Input } from '../../components/ui/Input';
+import { Field, Input, Select } from '../../components/ui/Input';
 
 const MODULE_LABEL_KEYS: Record<(typeof OPTIONAL_MODULE_KEYS)[number], string> = {
   bankLoans: 'organization.modules.bank_loans',
@@ -36,6 +36,9 @@ export function ApplicationSettingsPage() {
   const [form, setForm] = useState({
     dashboardRefreshSeconds: '60',
     sessionTimeoutMinutes: '30',
+    cashLimit: '500000',
+    receiptLanguage: 'ta',
+    qrCodesEnabled: false,
     modules: {
       bankLoans: false,
       auctions: false,
@@ -50,6 +53,9 @@ export function ApplicationSettingsPage() {
       setForm({
         dashboardRefreshSeconds: String(data.dashboardRefreshSeconds),
         sessionTimeoutMinutes: String(data.sessionTimeoutMinutes),
+        cashLimit: String(data.cashLimit ?? 500000),
+        receiptLanguage: data.receiptLanguage || 'ta',
+        qrCodesEnabled: data.qrCodesEnabled,
         modules: { ...data.modules },
       });
     }
@@ -60,6 +66,9 @@ export function ApplicationSettingsPage() {
       settingsApi.updatePreferences({
         dashboardRefreshSeconds: Number(form.dashboardRefreshSeconds),
         sessionTimeoutMinutes: Number(form.sessionTimeoutMinutes),
+        cashLimit: Number(form.cashLimit),
+        receiptLanguage: form.receiptLanguage,
+        qrCodesEnabled: form.qrCodesEnabled,
         modules: form.modules,
       }),
     onSuccess: async () => {
@@ -100,7 +109,7 @@ export function ApplicationSettingsPage() {
   if (isLoading) return <p className="text-sm text-zinc-500">{t('common:loading')}</p>;
 
   return (
-    <Card className="max-w-2xl p-4">
+    <Card className="max-w-5xl p-4">
       <h2 className="text-sm font-semibold text-zinc-950">{t('preferences.title')}</h2>
       <p className="mt-1 text-sm text-zinc-500">{t('preferences.hint')}</p>
       {error && (
@@ -109,7 +118,9 @@ export function ApplicationSettingsPage() {
         </div>
       )}
       {saved && <p className="mt-3 text-sm font-medium text-emerald-700">{t('preferences.saved')}</p>}
-      <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-4 space-y-6">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-4">
         <Field label={t('organization.dashboard_refresh_seconds')} required>
           <Input
             type="number"
@@ -142,7 +153,44 @@ export function ApplicationSettingsPage() {
           <p className="mt-1 text-xs text-zinc-500">{t('preferences.session_timeout_hint')}</p>
         </Field>
 
-        <div className="border-t border-zinc-200 pt-4">
+        <Field label={t('preferences.cash_limit')} required>
+          <Input
+            type="number"
+            min={0}
+            step={1000}
+            value={form.cashLimit}
+            onChange={(e) => setForm((f) => ({ ...f, cashLimit: e.target.value }))}
+            required
+          />
+          <p className="mt-1 text-xs text-zinc-500">{t('preferences.cash_limit_hint')}</p>
+        </Field>
+
+        <Field label={t('preferences.receipt_language')}>
+          <Select
+            value={form.receiptLanguage}
+            onChange={(e) => setForm((f) => ({ ...f, receiptLanguage: e.target.value }))}
+          >
+            <option value="ta">தமிழ் (Tamil)</option>
+            <option value="en">English</option>
+          </Select>
+          <p className="mt-1 text-xs text-zinc-500">{t('preferences.receipt_language_hint')}</p>
+        </Field>
+
+        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200/80 px-3 py-2.5 hover:bg-zinc-50">
+          <input
+            type="checkbox"
+            className="mt-0.5 h-4 w-4 rounded border-zinc-300"
+            checked={form.qrCodesEnabled}
+            onChange={(e) => setForm((f) => ({ ...f, qrCodesEnabled: e.target.checked }))}
+          />
+          <span>
+            <span className="block text-sm font-medium text-zinc-950">{t('preferences.qr_codes_enabled')}</span>
+            <span className="block text-xs text-zinc-500">{t('preferences.qr_codes_enabled_hint')}</span>
+          </span>
+        </label>
+          </div>
+
+          <div className="border-t border-zinc-200 pt-6 lg:border-l lg:border-t-0 lg:pt-0 lg:pl-6">
           <h3 className="text-sm font-semibold text-zinc-950">{t('organization.modules.title')}</h3>
           <p className="mt-1 text-xs text-zinc-500">{t('organization.modules.hint')}</p>
           <div className="mt-3 space-y-2">
@@ -172,6 +220,7 @@ export function ApplicationSettingsPage() {
                 </span>
               </label>
             ))}
+          </div>
           </div>
         </div>
 

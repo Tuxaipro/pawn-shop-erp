@@ -61,7 +61,9 @@ export default function App() {
         <Route
           element={
             <BranchProvider>
-              <LoanPrintPage />
+              <ModuleSettingsProvider>
+                <LoanPrintPage />
+              </ModuleSettingsProvider>
             </BranchProvider>
           }
           path="loans/:id/print"

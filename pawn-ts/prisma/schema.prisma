@@ -193,13 +193,17 @@ model OrganizationSettings {
   id                          Int      @id @default(1)
   companyName                 String   @default("") @map("company_name") @db.VarChar(100)
   proprietor                  String   @default("") @db.VarChar(100)
+  logoUrl                     String?  @map("logo_url") @db.Text
+  receiptLanguage             String   @default("ta") @map("receipt_language") @db.VarChar(5)
   dashboardRefreshSeconds     Int      @default(60) @map("dashboard_refresh_seconds")
   moduleBankLoansEnabled      Boolean  @default(false) @map("module_bank_loans_enabled")
   moduleAuctionsEnabled       Boolean  @default(false) @map("module_auctions_enabled")
   moduleInvestmentsEnabled    Boolean  @default(false) @map("module_investments_enabled")
   moduleGlEnabled             Boolean  @default(false) @map("module_gl_enabled")
   moduleNotificationsEnabled  Boolean  @default(false) @map("module_notifications_enabled")
+  qrCodesEnabled              Boolean  @default(false) @map("qr_codes_enabled")
   sessionTimeoutMinutes       Int      @default(30) @map("session_timeout_minutes")
+  cashLimit                   Decimal  @default(500000) @map("cash_limit") @db.Decimal(15, 2)
   updatedOn                   DateTime @updatedAt @map("updated_on")
 
   @@map("organization_settings")
@@ -227,6 +231,7 @@ model Branch {
   incomeExpenses IncomeExpense[]
   taxSlabs       TaxDeclaration[]
   dailyCashBalances DailyCashBalance[]
+  cashShopDeposits  CashShopDeposit[]
   cashTransfersFrom CashTransfer[] @relation("CashTransferFrom")
   cashTransfersTo   CashTransfer[] @relation("CashTransferTo")
   pettyCashEntries  PettyCashEntry[]
@@ -320,6 +325,7 @@ model Loan {
   settledAmount              Decimal   @default(0) @map("settled_amount") @db.Decimal(12, 2)
   loanSettledDate            DateTime? @map("loan_settled_date") @db.Date
   defaultStatus              Boolean   @default(false) @map("default_status")
+  qrCode                     String?   @map("qr_code") @db.VarChar(500)
   branchId                   Int       @default(1) @map("branch_id")
   createdOn                  DateTime  @default(now()) @map("created_on")
   updatedOn                  DateTime  @default(now()) @updatedAt @map("updated_on")
@@ -340,6 +346,7 @@ model Loan {
   @@index([isSettled, renewalDate])
   @@index([loanDate])
   @@index([branchId])
+  @@index([qrCode])
   @@map("loan_details")
 }
 
@@ -464,23 +471,53 @@ model IncomeExpense {
 }
 
 model DailyCashBalance {
-  id             Int       @id @default(autoincrement())
-  branchId       Int       @map("branch_id")
-  balanceDate    DateTime  @map("balance_date") @db.Date
-  openingBalance Decimal   @default(0) @map("opening_balance") @db.Decimal(15, 2)
-  closingBalance Decimal?  @map("closing_balance") @db.Decimal(15, 2)
-  vaultCash      Decimal   @default(0) @map("vault_cash") @db.Decimal(15, 2)
-  counterCash    Decimal   @default(0) @map("counter_cash") @db.Decimal(15, 2)
-  physicalCount  Decimal?  @map("physical_count") @db.Decimal(15, 2)
-  isClosed       Boolean   @default(false) @map("is_closed")
-  closedOn       DateTime? @map("closed_on")
-  closedBy       Int?      @map("closed_by")
-  notes          String    @default("") @db.VarChar(500)
+  id                     Int       @id @default(autoincrement())
+  branchId               Int       @map("branch_id")
+  balanceDate            DateTime  @map("balance_date") @db.Date
+  openingBalance         Decimal   @default(0) @map("opening_balance") @db.Decimal(15, 2)
+  closingBalance         Decimal?  @map("closing_balance") @db.Decimal(15, 2)
+  physicalCount          Decimal?  @map("physical_count") @db.Decimal(15, 2)
+  closingVariance        Decimal?  @map("closing_variance") @db.Decimal(15, 2)
+  recommendedBankDeposit Decimal?  @map("recommended_bank_deposit") @db.Decimal(15, 2)
+  isClosed               Boolean   @default(false) @map("is_closed")
+  closedOn               DateTime? @map("closed_on")
+  closedBy               Int?      @map("closed_by")
+  notes                  String    @default("") @db.VarChar(500)
 
-  branch Branch @relation(fields: [branchId], references: [id])
+  branch        Branch                  @relation(fields: [branchId], references: [id])
+  denominations CashDenominationCount[]
 
   @@unique([branchId, balanceDate])
   @@map("daily_cash_balances")
+}
+
+model CashDenominationCount {
+  id           Int @id @default(autoincrement())
+  balanceId    Int @map("balance_id")
+  denomination Int
+  quantity     Int @default(0)
+
+  balance DailyCashBalance @relation(fields: [balanceId], references: [id], onDelete: Cascade)
+
+  @@unique([balanceId, denomination])
+  @@map("cash_denomination_counts")
+}
+
+model CashShopDeposit {
+  id          Int      @id @default(autoincrement())
+  branchId    Int      @map("branch_id")
+  amount      Decimal  @db.Decimal(15, 2)
+  bankName    String   @map("bank_name") @db.VarChar(100)
+  reference   String   @default("") @db.VarChar(100)
+  depositDate DateTime @map("deposit_date") @db.Date
+  notes       String   @default("") @db.VarChar(500)
+  createdOn   DateTime @default(now()) @map("created_on")
+  createdBy   Int?     @map("created_by")
+
+  branch Branch @relation(fields: [branchId], references: [id])
+
+  @@index([branchId, depositDate])
+  @@map("cash_shop_deposits")
 }
 
 model CashTransfer {
@@ -518,8 +555,6 @@ model PettyCashEntry {
 
 model InventoryMeta {
   loanItemId BigInt  @id @map("loan_item_id")
-  barcode    String? @db.VarChar(50)
-  qrCode     String? @map("qr_code") @db.VarChar(100)
   location   String? @db.VarChar(100)
   lockerNo   String? @map("locker_no") @db.VarChar(50)
   photoUrl   String? @map("photo_url") @db.VarChar(500)
@@ -528,8 +563,6 @@ model InventoryMeta {
 
   loanItem LoanItem @relation(fields: [loanItemId], references: [id], onDelete: Cascade)
 
-  @@index([barcode])
-  @@index([qrCode])
   @@map("inventory_meta")
 }
 
